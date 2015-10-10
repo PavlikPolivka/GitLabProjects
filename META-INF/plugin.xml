@@ -1,0 +1,55 @@
+<idea-plugin version="2">
+    <id>com.ppolivka.gitlabprojects</id>
+    <name>GitLab Projects</name>
+    <version>1.0</version>
+    <vendor email="polivka.pavel@gmail.com" url="http://ppolivka.com">Pavel Polivka</vendor>
+
+    <description><![CDATA[
+      This plugin is adding support for list and checking out projects from GitLab.<br>
+      Use normal VCS Checkout menu, select GitLab, set info about your GitLab server and you are <b>READY</b>.
+    ]]></description>
+
+    <change-notes><![CDATA[
+        Initial release. Added GitLab support to checkout menu.
+    ]]>
+    </change-notes>
+
+    <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
+    <idea-version since-build="131"/>
+
+    <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
+         on how to target different products -->
+    <!-- uncomment to enable plugin in all products
+    <depends>com.intellij.modules.lang</depends>
+    -->
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+
+        <!-- Configuration state service ( persistable settings ) -->
+        <applicationService serviceInterface="com.ppolivka.gitlabprojects.configuration.SettingsState"
+                            serviceImplementation="com.ppolivka.gitlabprojects.configuration.SettingsState"/>
+
+        <!-- provider for the configurable instance ( configuration settings ) -->
+        <applicationConfigurable id="GitLabConfigurableProvider"
+                                 provider="com.ppolivka.gitlabprojects.configuration.SettingsConfigurableProvider"/>
+
+        <checkoutProvider implementation="com.ppolivka.gitlabprojects.list.GitLabCheckoutProvider" id="GitLabProjectList" order="FIRST" />
+
+    </extensions>
+
+    <application-components>
+
+    </application-components>
+
+    <project-components>
+        <!-- Add your project components here -->
+    </project-components>
+
+    <actions>
+        <!-- Add your actions here -->
+    </actions>
+
+    <depends>Git4Idea</depends>
+
+</idea-plugin>
