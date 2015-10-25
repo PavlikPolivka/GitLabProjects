@@ -3,6 +3,8 @@ package com.ppolivka.gitlabprojects.list;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.JBColor;
+import com.intellij.util.ImageLoader;
+import com.intellij.util.ui.JBImageIcon;
 import com.ppolivka.gitlabprojects.api.dto.Project;
 import com.ppolivka.gitlabprojects.common.Function;
 import com.ppolivka.gitlabprojects.configuration.SettingsDialog;
@@ -64,7 +66,9 @@ public class ListDialog extends JDialog {
         listingCellRenderer.setLeafIcon(IconLoader.findIcon("/icons/gitlab.png"));
 
         loadingCellRenderer.setBackgroundNonSelectionColor(WHITE);
-        loadingCellRenderer.setLeafIcon(AllIcons.RunConfigurations.LoadingTree);
+        JBImageIcon loadingIcon = new JBImageIcon(ImageLoader.loadFromResource("/icons/loading.gif"));
+        loadingIcon.setImageObserver(allProjects);
+        loadingCellRenderer.setLeafIcon(loadingIcon);
         loadingCellRenderer.setTextNonSelectionColor(JBColor.GRAY);
 
         allProjects.setCellRenderer(listingCellRenderer);
