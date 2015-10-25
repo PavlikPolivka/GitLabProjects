@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.intellij.ui.JBColor.WHITE;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 public class ListDialog extends JDialog {
     private JPanel contentPane;
@@ -30,13 +31,15 @@ public class ListDialog extends JDialog {
     private JTree allProjects;
     private JButton refreshButton;
     private JButton settingsButton;
+    private JButton checkoutButton;
     private SettingsState settingsState = SettingsState.getInstance();
-    DefaultTreeCellRenderer listingCellRenderer = new DefaultTreeCellRenderer();
-    DefaultTreeCellRenderer loadingCellRenderer = new DefaultTreeCellRenderer();
-    SettingsDialog settingsDialog = new SettingsDialog();
-    private Function selectAction;
+    private DefaultTreeCellRenderer listingCellRenderer = new DefaultTreeCellRenderer();
+    private DefaultTreeCellRenderer loadingCellRenderer = new DefaultTreeCellRenderer();
+    private SettingsDialog settingsDialog = new SettingsDialog();
+    private Function<String> selectAction;
+    private String lastUsedUrl = "";
 
-    public ListDialog(final Function selectAction) {
+    public ListDialog(final Function<String> selectAction) {
         this.selectAction = selectAction;
         setContentPane(contentPane);
         setModal(true);
@@ -77,21 +80,34 @@ public class ListDialog extends JDialog {
         allProjects.setDragEnabled(false);
         MouseListener ml = new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
+                checkoutButton.setEnabled(false);
                 int selRow = allProjects.getRowForLocation(e.getX(), e.getY());
                 TreePath selPath = allProjects.getPathForLocation(e.getX(), e.getY());
                 if (selRow != -1) {
-                    if (e.getClickCount() == 2) {
-                        DefaultMutableTreeNode selectedNode =
-                                ((DefaultMutableTreeNode) selPath.getLastPathComponent());
-                        if (selectedNode.getChildCount() == 0 && !allProjects.isRootVisible()) {
-                            String url = selectedNode.toString();
+                    DefaultMutableTreeNode selectedNode =
+                            ((DefaultMutableTreeNode) selPath.getLastPathComponent());
+                    String url = "";
+                    if (selectedNode.getChildCount() == 0 && !allProjects.isRootVisible()) {
+                        url = selectedNode.toString();
+                        checkoutButton.setEnabled(true);
+                        if (e.getClickCount() == 2) {
                             selectAction.execute(url);
+                        } else if(e.getClickCount() == 1) {
+                            lastUsedUrl = url;
                         }
                     }
                 }
             }
         };
         allProjects.addMouseListener(ml);
+        checkoutButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(isNotBlank(lastUsedUrl)) {
+                    selectAction.execute(lastUsedUrl);
+                }
+            }
+        });
 
         refreshButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

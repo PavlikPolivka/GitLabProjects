@@ -13,6 +13,7 @@
         Fix for other IDEs than IntelliJ<br>
         Fixed loading icon in list dialog<br>
         Change in color palette in list dialog<br>
+        Added checkout button for list dialog
     ]]>
     </change-notes>
 
