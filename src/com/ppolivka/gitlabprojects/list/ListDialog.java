@@ -2,7 +2,6 @@ package com.ppolivka.gitlabprojects.list;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.util.IconLoader;
-import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.ppolivka.gitlabprojects.api.dto.Project;
 import com.ppolivka.gitlabprojects.common.Function;
@@ -20,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.intellij.ui.JBColor.WHITE;
 
 public class ListDialog extends JDialog {
     private JPanel contentPane;
@@ -57,12 +58,12 @@ public class ListDialog extends JDialog {
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
-        listingCellRenderer.setBackgroundNonSelectionColor(Gray._232);
+        listingCellRenderer.setBackgroundNonSelectionColor(WHITE);
         listingCellRenderer.setClosedIcon(AllIcons.Nodes.TreeClosed);
         listingCellRenderer.setOpenIcon(AllIcons.Nodes.TreeOpen);
         listingCellRenderer.setLeafIcon(IconLoader.findIcon("/icons/gitlab.png"));
 
-        loadingCellRenderer.setBackgroundNonSelectionColor(Gray._232);
+        loadingCellRenderer.setBackgroundNonSelectionColor(WHITE);
         loadingCellRenderer.setLeafIcon(AllIcons.RunConfigurations.LoadingTree);
         loadingCellRenderer.setTextNonSelectionColor(JBColor.GRAY);
 

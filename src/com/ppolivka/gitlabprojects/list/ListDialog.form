@@ -63,7 +63,7 @@
               <component id="982a4" class="javax.swing.JTree" binding="allProjects">
                 <constraints/>
                 <properties>
-                  <background color="-1513240"/>
+                  <background color="-1"/>
                   <rootVisible value="false"/>
                 </properties>
               </component>
