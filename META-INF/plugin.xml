@@ -10,7 +10,9 @@
     ]]></description>
 
     <change-notes><![CDATA[
-        Fix for other IDEs than IntelliJ
+        Fix for other IDEs than IntelliJ<br>
+        Fixed loading icon in list dialog<br>
+        Change in color palette in list dialog<br>
     ]]>
     </change-notes>
 
