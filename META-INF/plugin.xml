@@ -10,21 +10,19 @@
     ]]></description>
 
     <change-notes><![CDATA[
-        Initial release. Added GitLab support to checkout menu.
+        Fix for other IDEs than IntelliJ<br>
+        Fixed loading icon in list dialog<br>
+        Change in color palette in list dialog<br>
+        Added checkout button for list dialog
     ]]>
     </change-notes>
 
-    <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
     <idea-version since-build="131"/>
 
-    <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
-         on how to target different products -->
-    <!-- uncomment to enable plugin in all products
-    <depends>com.intellij.modules.lang</depends>
-    -->
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.vcs</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <!-- Add your extensions here -->
 
         <!-- Configuration state service ( persistable settings ) -->
         <applicationService serviceInterface="com.ppolivka.gitlabprojects.configuration.SettingsState"

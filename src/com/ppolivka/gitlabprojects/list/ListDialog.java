@@ -2,8 +2,9 @@ package com.ppolivka.gitlabprojects.list;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.util.IconLoader;
-import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
+import com.intellij.util.ImageLoader;
+import com.intellij.util.ui.JBImageIcon;
 import com.ppolivka.gitlabprojects.api.dto.Project;
 import com.ppolivka.gitlabprojects.common.Function;
 import com.ppolivka.gitlabprojects.configuration.SettingsDialog;
@@ -21,19 +22,24 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.intellij.ui.JBColor.WHITE;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+
 public class ListDialog extends JDialog {
     private JPanel contentPane;
     private JButton buttonCancel;
     private JTree allProjects;
     private JButton refreshButton;
     private JButton settingsButton;
+    private JButton checkoutButton;
     private SettingsState settingsState = SettingsState.getInstance();
-    DefaultTreeCellRenderer listingCellRenderer = new DefaultTreeCellRenderer();
-    DefaultTreeCellRenderer loadingCellRenderer = new DefaultTreeCellRenderer();
-    SettingsDialog settingsDialog = new SettingsDialog();
-    private Function selectAction;
+    private DefaultTreeCellRenderer listingCellRenderer = new DefaultTreeCellRenderer();
+    private DefaultTreeCellRenderer loadingCellRenderer = new DefaultTreeCellRenderer();
+    private SettingsDialog settingsDialog = new SettingsDialog();
+    private Function<String> selectAction;
+    private String lastUsedUrl = "";
 
-    public ListDialog(final Function selectAction) {
+    public ListDialog(final Function<String> selectAction) {
         this.selectAction = selectAction;
         setContentPane(contentPane);
         setModal(true);
@@ -57,13 +63,15 @@ public class ListDialog extends JDialog {
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
-        listingCellRenderer.setBackgroundNonSelectionColor(Gray._232);
+        listingCellRenderer.setBackgroundNonSelectionColor(WHITE);
         listingCellRenderer.setClosedIcon(AllIcons.Nodes.TreeClosed);
         listingCellRenderer.setOpenIcon(AllIcons.Nodes.TreeOpen);
         listingCellRenderer.setLeafIcon(IconLoader.findIcon("/icons/gitlab.png"));
 
-        loadingCellRenderer.setBackgroundNonSelectionColor(Gray._232);
-        loadingCellRenderer.setLeafIcon(AllIcons.RunConfigurations.LoadingTree);
+        loadingCellRenderer.setBackgroundNonSelectionColor(WHITE);
+        JBImageIcon loadingIcon = new JBImageIcon(ImageLoader.loadFromResource("/icons/loading.gif"));
+        loadingIcon.setImageObserver(allProjects);
+        loadingCellRenderer.setLeafIcon(loadingIcon);
         loadingCellRenderer.setTextNonSelectionColor(JBColor.GRAY);
 
         allProjects.setCellRenderer(listingCellRenderer);
@@ -72,21 +80,34 @@ public class ListDialog extends JDialog {
         allProjects.setDragEnabled(false);
         MouseListener ml = new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
+                checkoutButton.setEnabled(false);
                 int selRow = allProjects.getRowForLocation(e.getX(), e.getY());
                 TreePath selPath = allProjects.getPathForLocation(e.getX(), e.getY());
                 if (selRow != -1) {
-                    if (e.getClickCount() == 2) {
-                        DefaultMutableTreeNode selectedNode =
-                                ((DefaultMutableTreeNode) selPath.getLastPathComponent());
-                        if (selectedNode.getChildCount() == 0 && !allProjects.isRootVisible()) {
-                            String url = selectedNode.toString();
+                    DefaultMutableTreeNode selectedNode =
+                            ((DefaultMutableTreeNode) selPath.getLastPathComponent());
+                    String url = "";
+                    if (selectedNode.getChildCount() == 0 && !allProjects.isRootVisible()) {
+                        url = selectedNode.toString();
+                        checkoutButton.setEnabled(true);
+                        if (e.getClickCount() == 2) {
                             selectAction.execute(url);
+                        } else if(e.getClickCount() == 1) {
+                            lastUsedUrl = url;
                         }
                     }
                 }
             }
         };
         allProjects.addMouseListener(ml);
+        checkoutButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(isNotBlank(lastUsedUrl)) {
+                    selectAction.execute(lastUsedUrl);
+                }
+            }
+        });
 
         refreshButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
