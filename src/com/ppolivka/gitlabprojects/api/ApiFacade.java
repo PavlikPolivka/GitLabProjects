@@ -1,8 +1,10 @@
 package com.ppolivka.gitlabprojects.api;
 
+import com.ppolivka.gitlabprojects.api.dto.NamespaceDto;
 import org.gitlab.api.GitlabAPI;
 import org.gitlab.api.models.GitlabNamespace;
 import org.gitlab.api.models.GitlabProject;
+import org.gitlab.api.models.GitlabSession;
 
 import java.io.IOException;
 import java.util.*;
@@ -17,6 +19,9 @@ public class ApiFacade {
 
     GitlabAPI api;
 
+    public ApiFacade() {
+    }
+
     public ApiFacade(String host, String key) {
         reload(host, key);
     }
@@ -30,10 +35,34 @@ public class ApiFacade {
         return false;
     }
 
+    public GitlabSession getSession() throws IOException {
+        return api.getCurrentSession();
+    }
+
     private void checkApi() throws IOException {
         if (api == null) {
             throw new IOException("please, configure plugin settings");
         }
+    }
+
+    public List<NamespaceDto> getNamespaces() throws IOException {
+        return api.retrieve().getAll("/namespaces", NamespaceDto[].class);
+    }
+
+    public GitlabProject createProject(String name, int visibilityLevel, boolean isPublic, NamespaceDto namespace, String description) throws IOException {
+        return api.createProject(
+                name,
+                namespace != null && namespace.getId() != 0 ? namespace.getId() : null,
+                description,
+                null,
+                null,
+                null,
+                null,
+                null,
+                isPublic,
+                visibilityLevel,
+                null
+        );
     }
 
     public Collection<GitlabProject> getProjects() throws Throwable {

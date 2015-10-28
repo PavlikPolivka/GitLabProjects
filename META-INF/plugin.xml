@@ -1,19 +1,18 @@
 <idea-plugin version="2">
     <id>com.ppolivka.gitlabprojects</id>
     <name>GitLab Projects</name>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
     <vendor email="polivka.pavel@gmail.com" url="http://ppolivka.com">Pavel Polivka</vendor>
 
     <description><![CDATA[
-      This plugin is adding support for list and checking out projects from GitLab.<br>
-      Use normal VCS Checkout menu, select GitLab, set info about your GitLab server and you are <b>READY</b>.
+      This plugin is adding support for list and checking out/importing projects from/to GitLab.<br>
+      Use normal VCS Checkout menu, select GitLab, set info about your GitLab server and you are <b>READY</b>.<br>
+      To import project to GitLab select Share to GitLab in VCS -> Import into version control
     ]]></description>
 
     <change-notes><![CDATA[
-        Fix for other IDEs than IntelliJ<br>
-        Fixed loading icon in list dialog<br>
-        Change in color palette in list dialog<br>
-        Added checkout button for list dialog
+        Improvements to Settings and Checkout dialog<br>
+        <h2>Added support for Import to VCS</h2><br>
     ]]>
     </change-notes>
 
@@ -32,7 +31,7 @@
         <applicationConfigurable id="GitLabConfigurableProvider"
                                  provider="com.ppolivka.gitlabprojects.configuration.SettingsConfigurableProvider"/>
 
-        <checkoutProvider implementation="com.ppolivka.gitlabprojects.list.GitLabCheckoutProvider" id="GitLabProjectList" order="FIRST" />
+        <checkoutProvider implementation="com.ppolivka.gitlabprojects.checkout.GitLabCheckoutProvider" id="GitLabProjectList" order="FIRST" />
 
     </extensions>
 
@@ -45,7 +44,9 @@
     </project-components>
 
     <actions>
-        <!-- Add your actions here -->
+        <action id="Gitlab.Share" class="com.ppolivka.gitlabprojects.share.GitLabShareAction">
+            <add-to-group group-id="Vcs.Import"/>
+        </action>
     </actions>
 
     <depends>Git4Idea</depends>

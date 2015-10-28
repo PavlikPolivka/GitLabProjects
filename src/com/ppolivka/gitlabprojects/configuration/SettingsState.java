@@ -6,10 +6,11 @@ import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import com.ppolivka.gitlabprojects.api.ApiFacade;
-import com.ppolivka.gitlabprojects.api.dto.Project;
+import com.ppolivka.gitlabprojects.api.dto.ProjectDto;
 import org.gitlab.api.models.GitlabProject;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -32,7 +33,7 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
 
     public String token;
 
-    public Collection<Project> projects = new ArrayList<>();
+    public Collection<ProjectDto> projects = new ArrayList<>();
 
     public static SettingsState getInstance() {
         return ServiceManager.getService(SettingsState.class);
@@ -49,13 +50,19 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
         XmlSerializerUtil.copyBean(settingsState, this);
     }
 
+    public void isApiValid(String host, String key) throws IOException {
+        ApiFacade apiFacade = new ApiFacade();
+        apiFacade.reload(host, key);
+        apiFacade.getSession();
+    }
+
     public void reloadProjects() throws Throwable {
         ApiFacade apiFacade = new ApiFacade(host, token);
 
-        Collection<Project> projects = new ArrayList<>();
+        Collection<ProjectDto> projects = new ArrayList<>();
 
             for (GitlabProject gitlabProject : apiFacade.getProjects()) {
-                Project project = new Project();
+                ProjectDto project = new ProjectDto();
                 project.setName(gitlabProject.getName());
                 project.setNamespace(gitlabProject.getNamespace().getName());
                 project.setHttpUrl(gitlabProject.getHttpUrl());
@@ -64,6 +71,10 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
             }
         this.setProjects(projects);
 
+    }
+
+    public ApiFacade api() {
+        return new ApiFacade(host, token);
     }
 
     //region Getters & Setters
@@ -84,11 +95,11 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
         this.token = token;
     }
 
-    public Collection<Project> getProjects() {
+    public Collection<ProjectDto> getProjects() {
         return projects;
     }
 
-    public void setProjects(Collection<Project> projects) {
+    public void setProjects(Collection<ProjectDto> projects) {
         this.projects = projects;
     }
 

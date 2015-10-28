@@ -1,10 +1,9 @@
-package com.ppolivka.gitlabprojects.list;
+package com.ppolivka.gitlabprojects.checkout;
 
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.ppolivka.gitlabprojects.common.Function;
 import git4idea.actions.BasicAction;
 import git4idea.checkout.GitCheckoutProvider;
 import git4idea.checkout.GitCloneDialog;
@@ -13,6 +12,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 
 /**
@@ -24,7 +25,6 @@ import java.io.File;
 public class GitLabCheckoutProvider extends GitCheckoutProvider {
 
     private Git myGit;
-    private ListDialog listDialog;
 
     public GitLabCheckoutProvider() {
         super(ServiceManager.getService(Git.class));
@@ -33,14 +33,11 @@ public class GitLabCheckoutProvider extends GitCheckoutProvider {
 
     @Override
     public void doCheckout(final Project project, final Listener listener) {
-
-        listDialog = new ListDialog(new Function<String>() {
-            @Override
-            public void execute(String value) {
-                showGitCheckoutDialog(project, listener, value);
-            }
-        });
-        listDialog.start();
+        GitLabCheckoutDialog gitLabCheckoutDialog = new GitLabCheckoutDialog(project);
+        gitLabCheckoutDialog.show();
+        if(gitLabCheckoutDialog.isOK() && isNotBlank(gitLabCheckoutDialog.getLastUsedUrl())) {
+            showGitCheckoutDialog(project, listener, gitLabCheckoutDialog.getLastUsedUrl());
+        }
     }
 
     public void showGitCheckoutDialog(@NotNull Project project, @Nullable Listener listener, String preselectedUrl) {
@@ -61,7 +58,6 @@ public class GitLabCheckoutProvider extends GitCheckoutProvider {
                 String directoryName = dialog.getDirectoryName();
                 String parentDirectory = dialog.getParentDirectory();
                 clone(project, this.myGit, listener, destinationParent, sourceRepositoryURL, directoryName, parentDirectory);
-                listDialog.setVisible(false);
             }
         }
     }
