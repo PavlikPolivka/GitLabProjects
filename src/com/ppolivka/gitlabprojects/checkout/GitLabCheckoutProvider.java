@@ -1,4 +1,4 @@
-package com.ppolivka.gitlabprojects.list;
+package com.ppolivka.gitlabprojects.checkout;
 
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
@@ -13,6 +13,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 
 /**
@@ -34,13 +36,17 @@ public class GitLabCheckoutProvider extends GitCheckoutProvider {
     @Override
     public void doCheckout(final Project project, final Listener listener) {
 
-        listDialog = new ListDialog(project, new Function<String>() {
+        Function<String> checkOutAction = new Function<String>() {
             @Override
             public void execute(String value) {
                 showGitCheckoutDialog(project, listener, value);
             }
-        });
-        listDialog.start();
+        };
+        GitLabCheckoutDialog gitLabCheckoutDialog = new GitLabCheckoutDialog(project);
+        gitLabCheckoutDialog.show();
+        if(gitLabCheckoutDialog.isOK() && isNotBlank(gitLabCheckoutDialog.getLastUsedUrl())) {
+            showGitCheckoutDialog(project, listener, gitLabCheckoutDialog.getLastUsedUrl());
+        }
     }
 
     public void showGitCheckoutDialog(@NotNull Project project, @Nullable Listener listener, String preselectedUrl) {

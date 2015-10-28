@@ -10,10 +10,7 @@
     ]]></description>
 
     <change-notes><![CDATA[
-        Fix for other IDEs than IntelliJ<br>
-        Fixed loading icon in list dialog<br>
-        Change in color palette in list dialog<br>
-        Added checkout button for list dialog
+        Improvements to Settings and Checkout dialog<br>
     ]]>
     </change-notes>
 
@@ -32,7 +29,7 @@
         <applicationConfigurable id="GitLabConfigurableProvider"
                                  provider="com.ppolivka.gitlabprojects.configuration.SettingsConfigurableProvider"/>
 
-        <checkoutProvider implementation="com.ppolivka.gitlabprojects.list.GitLabCheckoutProvider" id="GitLabProjectList" order="FIRST" />
+        <checkoutProvider implementation="com.ppolivka.gitlabprojects.checkout.GitLabCheckoutProvider" id="GitLabProjectList" order="FIRST" />
 
     </extensions>
 
