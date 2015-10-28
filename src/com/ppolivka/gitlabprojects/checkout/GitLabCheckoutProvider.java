@@ -4,7 +4,6 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.ppolivka.gitlabprojects.common.Function;
 import git4idea.actions.BasicAction;
 import git4idea.checkout.GitCheckoutProvider;
 import git4idea.checkout.GitCloneDialog;
@@ -26,7 +25,6 @@ import static org.apache.commons.lang.StringUtils.isNotBlank;
 public class GitLabCheckoutProvider extends GitCheckoutProvider {
 
     private Git myGit;
-    private ListDialog listDialog;
 
     public GitLabCheckoutProvider() {
         super(ServiceManager.getService(Git.class));
@@ -35,13 +33,6 @@ public class GitLabCheckoutProvider extends GitCheckoutProvider {
 
     @Override
     public void doCheckout(final Project project, final Listener listener) {
-
-        Function<String> checkOutAction = new Function<String>() {
-            @Override
-            public void execute(String value) {
-                showGitCheckoutDialog(project, listener, value);
-            }
-        };
         GitLabCheckoutDialog gitLabCheckoutDialog = new GitLabCheckoutDialog(project);
         gitLabCheckoutDialog.show();
         if(gitLabCheckoutDialog.isOK() && isNotBlank(gitLabCheckoutDialog.getLastUsedUrl())) {
@@ -67,7 +58,6 @@ public class GitLabCheckoutProvider extends GitCheckoutProvider {
                 String directoryName = dialog.getDirectoryName();
                 String parentDirectory = dialog.getParentDirectory();
                 clone(project, this.myGit, listener, destinationParent, sourceRepositoryURL, directoryName, parentDirectory);
-                listDialog.setVisible(false);
             }
         }
     }

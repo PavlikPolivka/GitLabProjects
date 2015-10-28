@@ -10,11 +10,10 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.JBColor;
-import com.intellij.util.ImageLoader;
 import com.intellij.util.ui.JBImageIcon;
 import com.ppolivka.gitlabprojects.api.dto.ProjectDto;
+import com.ppolivka.gitlabprojects.common.GitLabIcons;
 import com.ppolivka.gitlabprojects.configuration.ConfigurationDialog;
 import com.ppolivka.gitlabprojects.configuration.SettingsState;
 import org.jetbrains.annotations.Nullable;
@@ -34,7 +33,7 @@ import java.util.Map;
 import static com.intellij.ui.JBColor.WHITE;
 
 /**
- * TODO:Descibe
+ * Dialog displayed when checking out new project
  *
  * @author ppolivka
  * @since 28.10.2015
@@ -90,10 +89,10 @@ public class GitLabCheckoutDialog extends DialogWrapper {
 
         listingCellRenderer.setClosedIcon(AllIcons.Nodes.TreeClosed);
         listingCellRenderer.setOpenIcon(AllIcons.Nodes.TreeOpen);
-        listingCellRenderer.setLeafIcon(IconLoader.findIcon("/icons/gitlab.png"));
+        listingCellRenderer.setLeafIcon(GitLabIcons.gitLabIcon);
 
         loadingCellRenderer.setBackgroundNonSelectionColor(WHITE);
-        JBImageIcon loadingIcon = new JBImageIcon(ImageLoader.loadFromResource("/icons/loading.gif"));
+        JBImageIcon loadingIcon = GitLabIcons.loadingIcon;
         loadingIcon.setImageObserver(allProjects);
         loadingCellRenderer.setLeafIcon(loadingIcon);
         loadingCellRenderer.setTextNonSelectionColor(JBColor.GRAY);

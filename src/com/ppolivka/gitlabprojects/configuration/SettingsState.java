@@ -73,6 +73,10 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
 
     }
 
+    public ApiFacade api() {
+        return new ApiFacade(host, token);
+    }
+
     //region Getters & Setters
 
     public String getHost() {

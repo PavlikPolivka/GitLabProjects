@@ -11,6 +11,7 @@
 
     <change-notes><![CDATA[
         Improvements to Settings and Checkout dialog<br>
+        <h2>Added support for Import to VCS</h2><br>
     ]]>
     </change-notes>
 
@@ -42,7 +43,9 @@
     </project-components>
 
     <actions>
-        <!-- Add your actions here -->
+        <action id="Gitlab.Share" class="com.ppolivka.gitlabprojects.share.GitLabShareAction">
+            <add-to-group group-id="Vcs.Import"/>
+        </action>
     </actions>
 
     <depends>Git4Idea</depends>
