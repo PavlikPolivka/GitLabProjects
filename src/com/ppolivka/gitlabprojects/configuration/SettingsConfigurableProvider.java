@@ -15,7 +15,7 @@ public class SettingsConfigurableProvider extends ConfigurableProvider {
     @Nullable
     @Override
     public Configurable createConfigurable() {
-        return new SettingsConfigurable();
+        return new ConfigurationDialog(null);
     }
 
 }

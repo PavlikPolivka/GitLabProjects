@@ -8,7 +8,7 @@ import java.io.Serializable;
  * @author ppolivka
  * @since 10.10.2015
  */
-public class Project implements Serializable {
+public class ProjectDto implements Serializable {
     private String name;
     private String namespace;
     private String sshUrl;

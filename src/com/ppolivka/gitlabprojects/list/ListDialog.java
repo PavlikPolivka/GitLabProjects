@@ -1,21 +1,29 @@
 package com.ppolivka.gitlabprojects.list;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
+import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.JBColor;
 import com.intellij.util.ImageLoader;
 import com.intellij.util.ui.JBImageIcon;
-import com.ppolivka.gitlabprojects.api.dto.Project;
+import com.ppolivka.gitlabprojects.api.dto.ProjectDto;
 import com.ppolivka.gitlabprojects.common.Function;
-import com.ppolivka.gitlabprojects.configuration.SettingsDialog;
+import com.ppolivka.gitlabprojects.configuration.ConfigurationDialog;
 import com.ppolivka.gitlabprojects.configuration.SettingsState;
-import org.apache.commons.lang.exception.ExceptionUtils;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,14 +43,34 @@ public class ListDialog extends JDialog {
     private SettingsState settingsState = SettingsState.getInstance();
     private DefaultTreeCellRenderer listingCellRenderer = new DefaultTreeCellRenderer();
     private DefaultTreeCellRenderer loadingCellRenderer = new DefaultTreeCellRenderer();
-    private SettingsDialog settingsDialog = new SettingsDialog();
+    private ConfigurationDialog configurationDialog;
     private Function<String> selectAction;
     private String lastUsedUrl = "";
+    private Project project;
+    ActionListener settingsDialogActionListener;
 
-    public ListDialog(final Function<String> selectAction) {
+    public ListDialog(final Project project, final Function<String> selectAction) {
+        this.project = project;
         this.selectAction = selectAction;
+        this.configurationDialog = new ConfigurationDialog(project);
         setContentPane(contentPane);
         setModal(true);
+        final Component that = this;
+
+        settingsDialogActionListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                configurationDialog = new ConfigurationDialog(that, false);
+                configurationDialog.show();
+                if(configurationDialog.isOK() && configurationDialog.isModified()){
+                    try {
+                        configurationDialog.apply();
+                    } catch (ConfigurationException ignored) {
+                    }
+                    refreshTree();
+                }
+            }
+        };
 
         buttonCancel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -103,53 +131,50 @@ public class ListDialog extends JDialog {
         checkoutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(isNotBlank(lastUsedUrl)) {
+                if (isNotBlank(lastUsedUrl)) {
                     selectAction.execute(lastUsedUrl);
                 }
             }
         });
-
         refreshButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 refreshTree();
 
             }
         });
-        settingsButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                boolean refresh = settingsDialog.start("");
-                if(refresh) {
-                    refreshTree();
-                }
-
-            }
-        });
-        Collection<Project> projects = settingsState.getProjects();
-        reDrawTree(projects == null ? noProjects() : projects);
+        settingsButton.addActionListener(settingsDialogActionListener);
+        Collection<ProjectDto> projectDtos = settingsState.getProjects();
+        reDrawTree(projectDtos == null ? noProjects() : projectDtos);
 
     }
 
     private void refreshTree() {
         treeLoading();
-        Runnable refreshAction = new Runnable() {
+        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Refreshing tree..") {
+            boolean isError = false;
+
             @Override
-            public void run() {
+            public void run(ProgressIndicator progressIndicator) {
                 try {
                     settingsState.reloadProjects();
                     reDrawTree(settingsState.getProjects());
                 } catch (Throwable e) {
-                    if(settingsDialog.start(ExceptionUtils.getRootCauseMessage(e))) {
-                        refreshTree();
-                    }
+                    Notifications.Bus.notify(new Notification("GitLab Projects Plugin", "Tree Refresh", "Tree refreshing failed, plese correct your plugin settings.", NotificationType.ERROR));
+                    isError = true;
                 }
-
             }
-        };
-        new Thread(refreshAction).start();
+
+            @Override
+            public void onSuccess() {
+                super.onSuccess();
+                if(isError) {
+                    settingsDialogActionListener.actionPerformed(null);
+                }
+            }
+        });
     }
 
-    private Collection<Project> noProjects() {
+    private Collection<ProjectDto> noProjects() {
         return new ArrayList<>();
     }
 
@@ -160,13 +185,13 @@ public class ListDialog extends JDialog {
         allProjects.setModel(new DefaultTreeModel(root));
     }
 
-    private void reDrawTree(Collection<Project> projects) {
+    private void reDrawTree(Collection<ProjectDto> projectDtos) {
         allProjects.setCellRenderer(listingCellRenderer);
         allProjects.setRootVisible(false);
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("My Projects");
         Map<String, DefaultMutableTreeNode> namespaceMap = new HashMap<>();
-        for (Project project : projects) {
-            String namespace = project.getNamespace();
+        for (ProjectDto projectDto : projectDtos) {
+            String namespace = projectDto.getNamespace();
             DefaultMutableTreeNode namespaceNode;
             if (namespaceMap.containsKey(namespace)) {
                 namespaceNode = namespaceMap.get(namespace);
@@ -175,10 +200,10 @@ public class ListDialog extends JDialog {
                 namespaceMap.put(namespace, namespaceNode);
             }
 
-            DefaultMutableTreeNode projectNode = new DefaultMutableTreeNode(project.getName());
-            DefaultMutableTreeNode sshNode = new DefaultMutableTreeNode(project.getSshUrl());
+            DefaultMutableTreeNode projectNode = new DefaultMutableTreeNode(projectDto.getName());
+            DefaultMutableTreeNode sshNode = new DefaultMutableTreeNode(projectDto.getSshUrl());
             projectNode.add(sshNode);
-            DefaultMutableTreeNode httpNode = new DefaultMutableTreeNode(project.getHttpUrl());
+            DefaultMutableTreeNode httpNode = new DefaultMutableTreeNode(projectDto.getHttpUrl());
             projectNode.add(httpNode);
             namespaceNode.add(projectNode);
         }
@@ -200,4 +225,5 @@ public class ListDialog extends JDialog {
     private void onCancel() {
         dispose();
     }
+
 }

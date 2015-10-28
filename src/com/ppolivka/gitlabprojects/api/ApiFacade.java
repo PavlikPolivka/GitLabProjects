@@ -3,6 +3,7 @@ package com.ppolivka.gitlabprojects.api;
 import org.gitlab.api.GitlabAPI;
 import org.gitlab.api.models.GitlabNamespace;
 import org.gitlab.api.models.GitlabProject;
+import org.gitlab.api.models.GitlabSession;
 
 import java.io.IOException;
 import java.util.*;
@@ -17,6 +18,9 @@ public class ApiFacade {
 
     GitlabAPI api;
 
+    public ApiFacade() {
+    }
+
     public ApiFacade(String host, String key) {
         reload(host, key);
     }
@@ -28,6 +32,10 @@ public class ApiFacade {
             return true;
         }
         return false;
+    }
+
+    public GitlabSession getSession() throws IOException {
+        return api.getCurrentSession();
     }
 
     private void checkApi() throws IOException {

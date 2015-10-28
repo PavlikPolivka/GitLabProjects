@@ -34,7 +34,7 @@ public class GitLabCheckoutProvider extends GitCheckoutProvider {
     @Override
     public void doCheckout(final Project project, final Listener listener) {
 
-        listDialog = new ListDialog(new Function<String>() {
+        listDialog = new ListDialog(project, new Function<String>() {
             @Override
             public void execute(String value) {
                 showGitCheckoutDialog(project, listener, value);
