@@ -1,5 +1,6 @@
 package com.ppolivka.gitlabprojects.common;
 
+import com.intellij.concurrency.JobScheduler;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -7,8 +8,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.Ref;
+import com.intellij.openapi.util.ThrowableComputable;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.ThrowableConvertor;
 import com.intellij.util.containers.Convertor;
 import com.ppolivka.gitlabprojects.configuration.SettingsState;
 import git4idea.GitUtil;
@@ -22,7 +25,10 @@ import git4idea.repo.GitRepositoryManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -87,7 +93,13 @@ public class GitLabUtils {
     public static boolean isGitLabUrl(String url) {
         Pattern urlPattern = Pattern.compile("^(https?)://([-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])");
         Matcher matcher = urlPattern.matcher(settingsState.getHost());
-        return (matcher.matches() && url.contains(matcher.group(2)));
+        return (matcher.matches() && removeNotAlpha(url).contains(removeNotAlpha(matcher.group(2))));
+    }
+
+    public static String removeNotAlpha(String input) {
+        input = input.replaceAll("[^a-zA-Z]", "");
+        input = input.toLowerCase();
+        return input;
     }
 
     public static boolean addGitLabRemote(@NotNull Project project,
@@ -121,16 +133,40 @@ public class GitLabUtils {
             version = GitVersion.identifyVersion(executable);
         }
         catch (Exception e) {
-//            GithubNotifications.showErrorDialog(project, GitBundle.getString("find.git.error.title"), e); TODO
+            Messages.showErrorDialog(project, "Cannot find git executable.", "Cannot Find Git");
             return false;
         }
 
         if (!version.isSupported()) {
-//            GithubNotifications.showWarningDialog(project, GitBundle.message("find.git.unsupported.message", version.toString(), GitVersion.MIN),
-//                    GitBundle.getString("find.git.success.title")); TODO
+            Messages.showErrorDialog(project, "Your version of git is not supported.", "Cannot Find Git");
             return false;
         }
         return true;
+    }
+
+    public static <T> T computeValueInModal(@NotNull Project project,
+                                            @NotNull String caption,
+                                            @NotNull final ThrowableConvertor<ProgressIndicator, T, IOException> task) throws IOException {
+        final Ref<T> dataRef = new Ref<T>();
+        final Ref<Throwable> exceptionRef = new Ref<Throwable>();
+        ProgressManager.getInstance().run(new Task.Modal(project, caption, true) {
+            public void run(@NotNull ProgressIndicator indicator) {
+                try {
+                    dataRef.set(task.convert(indicator));
+                }
+                catch (Throwable e) {
+                    exceptionRef.set(e);
+                }
+            }
+        });
+        if (!exceptionRef.isNull()) {
+            Throwable e = exceptionRef.get();
+            if (e instanceof IOException) throw ((IOException)e);
+            if (e instanceof RuntimeException) throw ((RuntimeException)e);
+            if (e instanceof Error) throw ((Error)e);
+            throw new RuntimeException(e);
+        }
+        return dataRef.get();
     }
 
     public static <T> T computeValueInModal(@NotNull Project project,
@@ -165,6 +201,42 @@ public class GitLabUtils {
             throw new RuntimeException(e);
         }
         return dataRef.get();
+    }
+
+    public static <T> T runInterruptable(@NotNull final ProgressIndicator indicator,
+                                         @NotNull ThrowableComputable<T, IOException> task) throws IOException {
+        ScheduledFuture<?> future = null;
+        try {
+            final Thread thread = Thread.currentThread();
+            future = addCancellationListener(indicator, thread);
+
+            return task.compute();
+        }
+        finally {
+            if (future != null) future.cancel(true);
+            Thread.interrupted();
+        }
+    }
+
+    @NotNull
+    private static ScheduledFuture<?> addCancellationListener(@NotNull final ProgressIndicator indicator,
+                                                              @NotNull final Thread thread) {
+        return addCancellationListener(new Runnable() {
+            @Override
+            public void run() {
+                if (indicator.isCanceled()) thread.interrupt();
+            }
+        });
+    }
+
+    @NotNull
+    private static ScheduledFuture<?> addCancellationListener(@NotNull Runnable run) {
+        return JobScheduler.getScheduler().scheduleWithFixedDelay(run, 1000, 300, TimeUnit.MILLISECONDS);
+    }
+
+    @Messages.YesNoResult
+    public static boolean showYesNoDialog(@Nullable Project project, @NotNull String title, @NotNull String message) {
+        return Messages.YES == Messages.showYesNoDialog(project, message, title, Messages.getQuestionIcon());
     }
 
 }

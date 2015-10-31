@@ -37,7 +37,24 @@ public class ProjectState implements PersistentStateComponent<ProjectState.State
     }
 
     public static class State {
+        public Integer projectId;
+        public String lastMergedBranch;
+    }
 
+    public Integer getProjectId() {
+        return projectState.projectId;
+    }
+
+    public void setProjectId(Integer projectId) {
+        projectState.projectId = projectId;
+    }
+
+    public String getLastMergedBranch() {
+        return projectState.lastMergedBranch;
+    }
+
+    public void setLastMergedBranch(String lastMergedBranch) {
+        projectState.lastMergedBranch = lastMergedBranch;
     }
 
 }

@@ -37,6 +37,8 @@
         <!-- provider for the configurable instance ( configuration settings ) -->
         <applicationConfigurable id="GitLabConfigurableProvider"
                                  provider="com.ppolivka.gitlabprojects.configuration.SettingsConfigurableProvider"/>
+        <projectService serviceInterface="com.ppolivka.gitlabprojects.configuration.ProjectState"
+                        serviceImplementation="com.ppolivka.gitlabprojects.configuration.ProjectState"/>
 
         <checkoutProvider implementation="com.ppolivka.gitlabprojects.checkout.GitLabCheckoutProvider" id="GitLabProjectList" order="FIRST" />
 
@@ -54,9 +56,11 @@
         <action id="Gitlab.Share" class="com.ppolivka.gitlabprojects.share.GitLabShareAction">
             <add-to-group group-id="Vcs.Import"/>
         </action>
-        <action id="Gitlabb.Create.Merge.Request" class="com.ppolivka.gitlabprojects.merge.GitLabMergeRequestAction">
-            <add-to-group group-id="Git.Menu"/>
-        </action>
+        <group id="GitLabGroup" text="Git _Lab" popup="true" icon="/icons/gitLabSmall.png">
+            <action id="Gitlab.Create.Merge.Request" class="com.ppolivka.gitlabprojects.merge.GitLabMergeRequestAction"/>
+
+            <add-to-group group-id="VcsGlobalGroup" anchor="after" relative-to-action="Git.Menu"/>
+        </group>
     </actions>
 
     <depends>Git4Idea</depends>

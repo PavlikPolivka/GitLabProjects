@@ -1,11 +1,11 @@
 package com.ppolivka.gitlabprojects.merge;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.ppolivka.gitlabprojects.common.GitLabIcons;
 import com.ppolivka.gitlabprojects.common.GitLabUtils;
 import git4idea.DialogManager;
 
@@ -18,7 +18,7 @@ import git4idea.DialogManager;
 public class GitLabMergeRequestAction extends DumbAwareAction {
 
     public GitLabMergeRequestAction() {
-        super("Create Merge Request", "Creates merge request from current branch", GitLabIcons.gitLabIcon);
+        super("Create _Merge Request", "Creates merge request from current branch", AllIcons.Vcs.Merge);
     }
 
     @Override
