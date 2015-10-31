@@ -1,18 +1,30 @@
 <idea-plugin version="2">
     <id>com.ppolivka.gitlabprojects</id>
     <name>GitLab Projects</name>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
     <vendor email="polivka.pavel@gmail.com" url="http://ppolivka.com">Pavel Polivka</vendor>
 
     <description><![CDATA[
-      This plugin is adding support for list and checking out/importing projects from/to GitLab.<br>
-      Use normal VCS Checkout menu, select GitLab, set info about your GitLab server and you are <b>READY</b>.<br>
-      To import project to GitLab select Share to GitLab in VCS -> Import into version control
+        <h2>GitLab Projects Plugin</h2>
+        <p>Simple plugin that is adding support for GitLab specific actions to JetBrain IDEs</p>
+        <h3>Features:</h3>
+        <ul>
+            <li><b>GitLab Checkout dialog</b> - list all users projects on GitLab and provides quick way to clone them locally</li>
+            <li><b>GitLab Share dialog</b> - allows quick import of new projects to GitLab, user can specify namespace and project visibility</li>
+            <li><b>GitLab Merge Request dialog</b> - user can quickly create new merge requests from current branch</li>
+        </ul>
     ]]></description>
 
     <change-notes><![CDATA[
-        Improvements to Settings and Checkout dialog<br>
-        <h2>Added support for Import to VCS</h2><br>
+        <br><b>2. 11. 2015</b><br>
+        New GitLab logo<br>
+        Add Create Merge Request Dialog<br>
+
+        <br><b>28. 9. 2015</b><br>
+        Added support for Import to VCS<br>
+
+        <br><b>10. 9. 2015</b><br>
+        Added support for GitLab Checkout Dialog<br>
     ]]>
     </change-notes>
 
@@ -30,6 +42,8 @@
         <!-- provider for the configurable instance ( configuration settings ) -->
         <applicationConfigurable id="GitLabConfigurableProvider"
                                  provider="com.ppolivka.gitlabprojects.configuration.SettingsConfigurableProvider"/>
+        <projectService serviceInterface="com.ppolivka.gitlabprojects.configuration.ProjectState"
+                        serviceImplementation="com.ppolivka.gitlabprojects.configuration.ProjectState"/>
 
         <checkoutProvider implementation="com.ppolivka.gitlabprojects.checkout.GitLabCheckoutProvider" id="GitLabProjectList" order="FIRST" />
 
@@ -47,6 +61,11 @@
         <action id="Gitlab.Share" class="com.ppolivka.gitlabprojects.share.GitLabShareAction">
             <add-to-group group-id="Vcs.Import"/>
         </action>
+        <group id="GitLabGroup" text="Git _Lab" popup="true" icon="/icons/gitLabSmall.png">
+            <action id="Gitlab.Create.Merge.Request" class="com.ppolivka.gitlabprojects.merge.GitLabMergeRequestAction"/>
+
+            <add-to-group group-id="VcsGlobalGroup" anchor="after" relative-to-action="Git.Menu"/>
+        </group>
     </actions>
 
     <depends>Git4Idea</depends>

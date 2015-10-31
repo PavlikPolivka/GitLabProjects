@@ -2,9 +2,7 @@ package com.ppolivka.gitlabprojects.api;
 
 import com.ppolivka.gitlabprojects.api.dto.NamespaceDto;
 import org.gitlab.api.GitlabAPI;
-import org.gitlab.api.models.GitlabNamespace;
-import org.gitlab.api.models.GitlabProject;
-import org.gitlab.api.models.GitlabSession;
+import org.gitlab.api.models.*;
 
 import java.io.IOException;
 import java.util.*;
@@ -49,6 +47,14 @@ public class ApiFacade {
         return api.retrieve().getAll("/namespaces", NamespaceDto[].class);
     }
 
+    public GitlabMergeRequest createMergeRequest(GitlabProject project, String from, String to, String title, String description) throws IOException {
+        String tailUrl = "/projects/"+project.getId()+ "/merge_requests";
+        return api.dispatch()
+                .with("source_branch", from)
+                .with("target_branch", to)
+                .with("title", title)
+                .with("description", description).to(tailUrl, GitlabMergeRequest.class);}
+
     public GitlabProject createProject(String name, int visibilityLevel, boolean isPublic, NamespaceDto namespace, String description) throws IOException {
         return api.createProject(
                 name,
@@ -63,6 +69,14 @@ public class ApiFacade {
                 visibilityLevel,
                 null
         );
+    }
+
+    public GitlabProject getProject(Integer id) throws IOException {
+        return api.getProject(id);
+    }
+
+    public List<GitlabBranch> loadProjectBranches(GitlabProject gitlabProject) throws IOException {
+        return api.getBranches(gitlabProject);
     }
 
     public Collection<GitlabProject> getProjects() throws Throwable {
