@@ -1,4 +1,4 @@
-package com.ppolivka.gitlabprojects.merge;
+package com.ppolivka.gitlabprojects.merge.request;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -30,7 +30,7 @@ public class GitLabMergeRequestAction extends DumbAwareAction {
             return;
         }
 
-        GitLabMergeRequestWorker mergeRequestWorker = GitLabMergeRequestWorker.create(project, file);
+        GitLabCreateMergeRequestWorker mergeRequestWorker = GitLabCreateMergeRequestWorker.create(project, file);
         CreateMergeRequestDialog createMergeRequestDialog = new CreateMergeRequestDialog(project, mergeRequestWorker);
         DialogManager.show(createMergeRequestDialog);
     }

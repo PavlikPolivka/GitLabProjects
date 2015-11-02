@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.ppolivka.gitlabprojects</id>
     <name>GitLab Projects</name>
-    <version>1.2.0</version>
+    <version>1.3.0</version>
     <vendor email="polivka.pavel@gmail.com" url="http://ppolivka.com">Pavel Polivka</vendor>
 
     <description><![CDATA[
@@ -62,7 +62,8 @@
             <add-to-group group-id="Vcs.Import"/>
         </action>
         <group id="GitLabGroup" text="Git _Lab" popup="true" icon="/icons/gitLabSmall.png">
-            <action id="Gitlab.Create.Merge.Request" class="com.ppolivka.gitlabprojects.merge.GitLabMergeRequestAction"/>
+            <action id="Gitlab.Create.Merge.Request" class="com.ppolivka.gitlabprojects.merge.request.GitLabMergeRequestAction"/>
+            <action id="Gitlab.Create.Merge.Request.List" class="com.ppolivka.gitlabprojects.merge.list.GitLabMergeRequestListAction"/>
 
             <add-to-group group-id="VcsGlobalGroup" anchor="after" relative-to-action="Git.Menu"/>
         </group>

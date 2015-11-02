@@ -1,4 +1,4 @@
-package com.ppolivka.gitlabprojects.merge;
+package com.ppolivka.gitlabprojects.merge.request;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -6,6 +6,7 @@ import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.SortedComboBoxModel;
 import com.ppolivka.gitlabprojects.configuration.ProjectState;
+import com.ppolivka.gitlabprojects.merge.info.BranchInfo;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,15 +31,15 @@ public class CreateMergeRequestDialog extends DialogWrapper {
     private JTextArea mergeDescription;
     private JButton diffButton;
 
-    private SortedComboBoxModel<GitLabMergeRequestWorker.BranchInfo> myBranchModel;
-    private GitLabMergeRequestWorker.BranchInfo lastSelectedBranch;
+    private SortedComboBoxModel<BranchInfo> myBranchModel;
+    private BranchInfo lastSelectedBranch;
 
     final ProjectState projectState;
 
     @NotNull
-    final GitLabMergeRequestWorker mergeRequestWorker;
+    final GitLabCreateMergeRequestWorker mergeRequestWorker;
 
-    protected CreateMergeRequestDialog(@Nullable Project project, @NotNull GitLabMergeRequestWorker gitLabMergeRequestWorker) {
+    public CreateMergeRequestDialog(@Nullable Project project, @NotNull GitLabCreateMergeRequestWorker gitLabMergeRequestWorker) {
         super(project);
         projectState = ProjectState.getInstance(project);
         mergeRequestWorker = gitLabMergeRequestWorker;
@@ -54,9 +55,9 @@ public class CreateMergeRequestDialog extends DialogWrapper {
 
         currentBranch.setText(mergeRequestWorker.getGitLocalBranch().getName());
 
-        myBranchModel = new SortedComboBoxModel<>(new Comparator<GitLabMergeRequestWorker.BranchInfo>() {
+        myBranchModel = new SortedComboBoxModel<>(new Comparator<BranchInfo>() {
             @Override
-            public int compare(GitLabMergeRequestWorker.BranchInfo o1, GitLabMergeRequestWorker.BranchInfo o2) {
+            public int compare(BranchInfo o1, BranchInfo o2) {
                 return StringUtil.naturalCompare(o1.getName(), o2.getName());
             }
         });
@@ -74,7 +75,7 @@ public class CreateMergeRequestDialog extends DialogWrapper {
                 prepareTitle();
                 lastSelectedBranch = getSelectedBranch();
                 projectState.setLastMergedBranch(getSelectedBranch().getName());
-                mergeRequestWorker.launchLoadDiffInfo(getSelectedBranch());
+                mergeRequestWorker.getDiffViewWorker().launchLoadDiffInfo(mergeRequestWorker.getLocalBranchInfo(), getSelectedBranch());
             }
         });
 
@@ -83,14 +84,14 @@ public class CreateMergeRequestDialog extends DialogWrapper {
         diffButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mergeRequestWorker.showDiffDialog(getSelectedBranch());
+                mergeRequestWorker.getDiffViewWorker().showDiffDialog(mergeRequestWorker.getLocalBranchInfo(), getSelectedBranch());
             }
         });
     }
 
     @Override
     protected void doOKAction() {
-        GitLabMergeRequestWorker.BranchInfo branch = getSelectedBranch();
+        BranchInfo branch = getSelectedBranch();
         if (mergeRequestWorker.checkAction(branch)) {
             mergeRequestWorker.createMergeRequest(branch, mergeTitle.getText(), mergeDescription.getText());
             super.doOKAction();
@@ -109,8 +110,8 @@ public class CreateMergeRequestDialog extends DialogWrapper {
         return null;
     }
 
-    private GitLabMergeRequestWorker.BranchInfo getSelectedBranch() {
-        return (GitLabMergeRequestWorker.BranchInfo) targetBranch.getSelectedItem();
+    private BranchInfo getSelectedBranch() {
+        return (BranchInfo) targetBranch.getSelectedItem();
     }
 
     private void prepareTitle() {
@@ -119,7 +120,7 @@ public class CreateMergeRequestDialog extends DialogWrapper {
         }
     }
 
-    private String mergeTitleGenerator(GitLabMergeRequestWorker.BranchInfo branchInfo) {
+    private String mergeTitleGenerator(BranchInfo branchInfo) {
         return "Merge of " + currentBranch.getText() + " to " + branchInfo;
     }
 
