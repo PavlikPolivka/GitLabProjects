@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.ppolivka.gitlabprojects</id>
     <name>GitLab Projects</name>
-    <version>1.2.0</version>
+    <version>1.2.1</version>
     <vendor email="polivka.pavel@gmail.com" url="http://ppolivka.com">Pavel Polivka</vendor>
 
     <description><![CDATA[
@@ -16,6 +16,9 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <br><b>6. 11. 2016</b></br>
+        Create Merge Request dialog fix<br>
+
         <br><b>2. 11. 2015</b><br>
         New GitLab logo<br>
         Add Create Merge Request Dialog<br>

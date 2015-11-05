@@ -1,13 +1,14 @@
 package com.ppolivka.gitlabprojects.merge;
 
 import com.intellij.notification.NotificationListener;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.progress.EmptyProgressIndicator;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
+import com.ppolivka.gitlabprojects.common.messages.Messages;
 import com.intellij.openapi.util.Couple;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.ThrowableComputable;
@@ -346,18 +347,21 @@ public class GitLabMergeRequestWorker {
                 String remoteProjectName = remote.first.getName();
                 mergeRequestWorker.setRemoteUrl(remote.getSecond());
 
+                String remoteUrl = remote.getFirst().getFirstUrl();
+
                 Integer projectId = projectState.getProjectId();
                 if (projectId == null) {
                     try {
                         Collection<GitlabProject> projects = settingsState.api().getProjects();
                         for (GitlabProject gitlabProject : projects) {
-                            if (gitlabProject.getName().equals(remoteProjectName)) {
+                            if (gitlabProject.getName().equals(remoteProjectName) || gitlabProject.getSshUrl().equals(remoteUrl) || gitlabProject.getHttpUrl().equals(remoteUrl)) {
                                 projectId = gitlabProject.getId();
                                 projectState.setProjectId(projectId);
                                 break;
                             }
                         }
                     } catch (Throwable throwable) {
+                        new Notifications.Bus().notify();
                         Messages.showErrorDialog(project, "Cannot find this project in GitLab Remote", CANNOT_CREATE_MERGE_REQUEST);
                         return null;
                     }
