@@ -1,18 +1,15 @@
 package com.ppolivka.gitlabprojects.merge;
 
-import com.intellij.notification.NotificationListener;
 import com.intellij.notification.Notifications;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
-import com.ppolivka.gitlabprojects.common.messages.Messages;
-import com.intellij.openapi.util.Couple;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.ppolivka.gitlabprojects.common.GitLabUtils;
+import com.ppolivka.gitlabprojects.common.exceptions.MergeRequestException;
+import com.ppolivka.gitlabprojects.common.messages.Messages;
 import com.ppolivka.gitlabprojects.configuration.ProjectState;
 import com.ppolivka.gitlabprojects.configuration.SettingsState;
-import com.ppolivka.gitlabprojects.exception.MergeRequestException;
 import git4idea.commands.Git;
 import git4idea.repo.GitRemote;
 import git4idea.repo.GitRepository;
