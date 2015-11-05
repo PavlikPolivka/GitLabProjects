@@ -31,7 +31,9 @@ public class GitLabMergeRequestAction extends DumbAwareAction {
         }
 
         GitLabMergeRequestWorker mergeRequestWorker = GitLabMergeRequestWorker.create(project, file);
-        CreateMergeRequestDialog createMergeRequestDialog = new CreateMergeRequestDialog(project, mergeRequestWorker);
-        DialogManager.show(createMergeRequestDialog);
+        if(mergeRequestWorker != null) {
+            CreateMergeRequestDialog createMergeRequestDialog = new CreateMergeRequestDialog(project, mergeRequestWorker);
+            DialogManager.show(createMergeRequestDialog);
+        }
     }
 }
