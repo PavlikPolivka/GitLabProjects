@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 
 /**
- * TODO:Descibe
+ * Class containing info about branch
  *
  * @author ppolivka
  * @since 31.10.2015

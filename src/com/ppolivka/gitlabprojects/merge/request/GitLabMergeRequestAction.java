@@ -6,7 +6,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.ppolivka.gitlabprojects.common.GitLabUtils;
+import com.ppolivka.gitlabprojects.util.GitLabUtil;
 import git4idea.DialogManager;
 
 /**
@@ -26,7 +26,7 @@ public class GitLabMergeRequestAction extends DumbAwareAction {
         final Project project = anActionEvent.getData(CommonDataKeys.PROJECT);
         final VirtualFile file = anActionEvent.getData(CommonDataKeys.VIRTUAL_FILE);
 
-        if (project == null || project.isDisposed() || !GitLabUtils.testGitExecutable(project)) {
+        if (project == null || project.isDisposed() || !GitLabUtil.testGitExecutable(project)) {
             return;
         }
 

@@ -5,7 +5,6 @@ import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
-import com.ppolivka.gitlabprojects.common.EditableView;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,7 +29,7 @@ import static org.apache.commons.lang.StringUtils.isNotBlank;
  * @author ppolivka
  * @since 27.10.2015
  */
-public class ConfigurationDialog extends DialogWrapper implements SearchableConfigurable, EditableView<SettingsState, String[]> {
+public class ConfigurationDialog extends DialogWrapper implements SearchableConfigurable {
 
     private static final String DIALOG_TITLE = "GitLab Settings";
     SettingsState settingsState = SettingsState.getInstance();
@@ -173,13 +172,11 @@ public class ConfigurationDialog extends DialogWrapper implements SearchableConf
     //endregion
 
     //region Editable View interface methods
-    @Override
     public void fill(SettingsState settingsState) {
         textHost.setText(settingsState == null ? "" : settingsState.getHost());
         textAPI.setText(settingsState == null ? "" : settingsState.getToken());
     }
 
-    @Override
     public String[] save() {
         return new String[]{textHost.getText(), textAPI.getText()};
     }

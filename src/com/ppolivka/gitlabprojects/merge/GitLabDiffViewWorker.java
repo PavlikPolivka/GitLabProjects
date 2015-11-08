@@ -4,13 +4,12 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.EmptyProgressIndicator;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Couple;
 import com.intellij.openapi.util.ThrowableComputable;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.util.ThrowableConvertor;
-import com.ppolivka.gitlabprojects.common.GitLabUtils;
+import com.ppolivka.gitlabprojects.util.GitLabUtil;
 import com.ppolivka.gitlabprojects.common.MasterFutureTask;
 import com.ppolivka.gitlabprojects.common.SlaveFutureTask;
 import com.ppolivka.gitlabprojects.merge.info.BranchInfo;
@@ -32,8 +31,10 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
+import static com.ppolivka.gitlabprojects.util.MessageUtil.showErrorDialog;
+
 /**
- * TODO:Descibe
+ * Worker class that helps to calculate diff between two branches
  *
  * @author ppolivka
  * @since 31.10.2015
@@ -54,11 +55,11 @@ public class GitLabDiffViewWorker {
     public void showDiffDialog(@NotNull final BranchInfo from, @NotNull final BranchInfo branch) {
         DiffInfo info;
         try {
-            info = GitLabUtils
+            info = GitLabUtil
                     .computeValueInModal(project, "Collecting diff data...", new ThrowableConvertor<ProgressIndicator, DiffInfo, IOException>() {
                         @Override
                         public DiffInfo convert(ProgressIndicator indicator) throws IOException {
-                            return GitLabUtils.runInterruptable(indicator, new ThrowableComputable<DiffInfo, IOException>() {
+                            return GitLabUtil.runInterruptable(indicator, new ThrowableComputable<DiffInfo, IOException>() {
                                 @Override
                                 public DiffInfo compute() throws IOException {
                                     return getDiffInfo(from, branch);
@@ -67,11 +68,11 @@ public class GitLabDiffViewWorker {
                         }
                     });
         } catch (IOException e) {
-            Messages.showErrorDialog(project, "Can't collect diff data", CANNOT_SHOW_DIFF_INFO);
+            showErrorDialog(project, "Can't collect diff data", CANNOT_SHOW_DIFF_INFO);
             return;
         }
         if (info == null) {
-            Messages.showErrorDialog(project, "Can't collect diff data", CANNOT_SHOW_DIFF_INFO);
+            showErrorDialog(project, "Can't collect diff data", CANNOT_SHOW_DIFF_INFO);
             return;
         }
 

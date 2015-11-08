@@ -1,4 +1,4 @@
-package com.ppolivka.gitlabprojects.common;
+package com.ppolivka.gitlabprojects.util;
 
 import com.intellij.concurrency.JobScheduler;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -32,13 +32,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.ppolivka.gitlabprojects.util.MessageUtil.showErrorDialog;
+
 /**
  * GitLab specific untils
  *
  * @author ppolivka
  * @since 28.10.2015
  */
-public class GitLabUtils {
+public class GitLabUtil {
 
     private static SettingsState settingsState = SettingsState.getInstance();
 
@@ -113,14 +115,14 @@ public class GitLabUtils {
             handler.addParameters("add", remote, url);
             handler.run();
             if (handler.getExitCode() != 0) {
-                Messages.showErrorDialog(project, "New remote origin cannot be added to this project.", "Cannot Add New Remote");
+                showErrorDialog(project, "New remote origin cannot be added to this project.", "Cannot Add New Remote");
                 return false;
             }
             // catch newly added remote
             repository.update();
             return true;
         } catch (VcsException e) {
-            Messages.showErrorDialog(project, "New remote origin cannot be added to this project.", "Cannot Add New Remote");
+            showErrorDialog(project, "New remote origin cannot be added to this project.", "Cannot Add New Remote");
             return false;
         }
     }
@@ -133,12 +135,12 @@ public class GitLabUtils {
             version = GitVersion.identifyVersion(executable);
         }
         catch (Exception e) {
-            Messages.showErrorDialog(project, "Cannot find git executable.", "Cannot Find Git");
+            showErrorDialog(project, "Cannot find git executable.", "Cannot Find Git");
             return false;
         }
 
         if (!version.isSupported()) {
-            Messages.showErrorDialog(project, "Your version of git is not supported.", "Cannot Find Git");
+            showErrorDialog(project, "Your version of git is not supported.", "Cannot Find Git");
             return false;
         }
         return true;

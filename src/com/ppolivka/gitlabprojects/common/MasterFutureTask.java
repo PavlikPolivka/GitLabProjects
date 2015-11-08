@@ -10,7 +10,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 
 /**
- * TODO:Descibe
+ * Future task acting as master task
  *
  * @author ppolivka
  * @since 31.10.2015
@@ -36,7 +36,7 @@ public class MasterFutureTask<T> extends FutureTask<T> {
                     return false;
                 }
                 if (mySlaves == null) {
-                    mySlaves = new ArrayList<SlaveFutureTask>();
+                    mySlaves = new ArrayList<>();
                 }
                 mySlaves.add(slave);
                 return true;

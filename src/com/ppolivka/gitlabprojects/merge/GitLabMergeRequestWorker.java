@@ -5,11 +5,10 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.ppolivka.gitlabprojects.common.GitLabUtils;
-import com.ppolivka.gitlabprojects.common.exceptions.MergeRequestException;
-import com.ppolivka.gitlabprojects.common.messages.Messages;
+import com.ppolivka.gitlabprojects.util.GitLabUtil;
 import com.ppolivka.gitlabprojects.configuration.ProjectState;
 import com.ppolivka.gitlabprojects.configuration.SettingsState;
+import com.ppolivka.gitlabprojects.exception.MergeRequestException;
 import git4idea.commands.Git;
 import git4idea.repo.GitRemote;
 import git4idea.repo.GitRepository;
@@ -19,8 +18,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
+import static com.ppolivka.gitlabprojects.util.MessageUtil.showErrorDialog;
+
 /**
- * TODO:Descibe
+ * Interface for worker classes that are related to merge requests
  *
  * @author ppolivka
  * @since 31.10.2015
@@ -74,17 +75,17 @@ public interface GitLabMergeRequestWorker {
             Git git = ServiceManager.getService(Git.class);
             mergeRequestWorker.setGit(git);
 
-            GitRepository gitRepository = GitLabUtils.getGitRepository(project, file);
+            GitRepository gitRepository = GitLabUtil.getGitRepository(project, file);
             if (gitRepository == null) {
-                Messages.showErrorDialog(project, "Can't find git repository", CANNOT_CREATE_MERGE_REQUEST);
+                showErrorDialog(project, "Can't find git repository", CANNOT_CREATE_MERGE_REQUEST);
                 throw new MergeRequestException();
             }
             gitRepository.update();
             mergeRequestWorker.setGitRepository(gitRepository);
 
-            Pair<GitRemote, String> remote = GitLabUtils.findGitLabRemote(gitRepository);
+            Pair<GitRemote, String> remote = GitLabUtil.findGitLabRemote(gitRepository);
             if (remote == null) {
-                Messages.showErrorDialog(project, "Can't find GitHub remote", CANNOT_CREATE_MERGE_REQUEST);
+                showErrorDialog(project, "Can't find GitHub remote", CANNOT_CREATE_MERGE_REQUEST);
                 throw new MergeRequestException();
             }
 
@@ -107,14 +108,14 @@ public interface GitLabMergeRequestWorker {
                         }
                     } catch (Throwable throwable) {
                         new Notifications.Bus().notify();
-                        Messages.showErrorDialog(project, "Cannot find this project in GitLab Remote", CANNOT_CREATE_MERGE_REQUEST);
+                        showErrorDialog(project, "Cannot find this project in GitLab Remote", CANNOT_CREATE_MERGE_REQUEST);
                         throw new MergeRequestException();
                     }
                 }
                 try {
                     mergeRequestWorker.setGitlabProject(settingsState.api().getProject(projectId));
                 } catch (Exception e) {
-                    Messages.showErrorDialog(project, "Cannot find this project in GitLab Remote", CANNOT_CREATE_MERGE_REQUEST);
+                    showErrorDialog(project, "Cannot find this project in GitLab Remote", CANNOT_CREATE_MERGE_REQUEST);
                     throw new MergeRequestException();
                 }
 

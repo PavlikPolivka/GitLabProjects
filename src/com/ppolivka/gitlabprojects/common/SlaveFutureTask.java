@@ -8,7 +8,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
 /**
- * TODO:Descibe
+ * Future task acting as slave, waits until master is done to start executing
+ * Master and slaves needs to be done to consider whole action as done
  *
  * @author ppolivka
  * @since 31.10.2015

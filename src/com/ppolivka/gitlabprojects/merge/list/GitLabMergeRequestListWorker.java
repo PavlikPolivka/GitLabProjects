@@ -2,10 +2,9 @@ package com.ppolivka.gitlabprojects.merge.list;
 
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.containers.Convertor;
-import com.ppolivka.gitlabprojects.common.GitLabUtils;
+import com.ppolivka.gitlabprojects.util.GitLabUtil;
 import com.ppolivka.gitlabprojects.configuration.ProjectState;
 import com.ppolivka.gitlabprojects.configuration.SettingsState;
 import com.ppolivka.gitlabprojects.exception.MergeRequestException;
@@ -21,6 +20,9 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+
+import static com.ppolivka.gitlabprojects.merge.GitLabMergeRequestWorker.Util.fillRequiredInfo;
+import static com.ppolivka.gitlabprojects.util.MessageUtil.showErrorDialog;
 
 /**
  * TODO:Descibe
@@ -45,13 +47,13 @@ public class GitLabMergeRequestListWorker implements GitLabMergeRequestWorker {
 
 
     public static GitLabMergeRequestListWorker create(@NotNull final Project project, @Nullable final VirtualFile file) {
-        return GitLabUtils.computeValueInModal(project, "Loading data...", new Convertor<ProgressIndicator, GitLabMergeRequestListWorker>() {
+        return GitLabUtil.computeValueInModal(project, "Loading data...", new Convertor<ProgressIndicator, GitLabMergeRequestListWorker>() {
             @Override
             public GitLabMergeRequestListWorker convert(ProgressIndicator indicator) {
                 GitLabMergeRequestListWorker mergeRequestListWorker = new GitLabMergeRequestListWorker();
 
                 try {
-                    Util.fillRequiredInfo(mergeRequestListWorker, project, file);
+                    fillRequiredInfo(mergeRequestListWorker, project, file);
                 } catch (MergeRequestException e) {
                     return null;
                 }
@@ -60,7 +62,7 @@ public class GitLabMergeRequestListWorker implements GitLabMergeRequestWorker {
                     mergeRequestListWorker.setMergeRequests(settingsState.api().getMergeRequests(mergeRequestListWorker.getGitlabProject()));
                 } catch (IOException e) {
                     mergeRequestListWorker.setMergeRequests(Collections.<GitlabMergeRequest>emptyList());
-                    Messages.showErrorDialog(project, "Cannot load merge requests from GitLab API", "Cannot Load Merge Requests");
+                    showErrorDialog(project, "Cannot load merge requests from GitLab API", "Cannot Load Merge Requests");
                 }
 
                 return mergeRequestListWorker;

@@ -5,7 +5,6 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.CollectionComboBoxModel;
 import com.ppolivka.gitlabprojects.api.dto.NamespaceDto;
@@ -20,6 +19,8 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.ppolivka.gitlabprojects.util.MessageUtil.showErrorDialog;
 
 /**
  * Dialog that is displayed when sharing project to git lab
@@ -122,7 +123,7 @@ public class GitLabShareDialog extends DialogWrapper {
             public void onSuccess() {
                 super.onSuccess();
                 if(isError) {
-                    Messages.showErrorDialog(project, "Groups cannot be refreshed", "Error Loading Groups");
+                    showErrorDialog(project, "Groups cannot be refreshed", "Error Loading Groups");
                     close(CLOSE_EXIT_CODE);
                 }
             }

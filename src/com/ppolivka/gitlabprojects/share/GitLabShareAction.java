@@ -8,7 +8,6 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.vcs.ProjectLevelVcsManager;
 import com.intellij.openapi.vcs.VcsException;
@@ -17,7 +16,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.containers.ContainerUtil;
 import com.ppolivka.gitlabprojects.api.dto.NamespaceDto;
 import com.ppolivka.gitlabprojects.common.GitLabIcons;
-import com.ppolivka.gitlabprojects.common.GitLabUtils;
+import com.ppolivka.gitlabprojects.util.GitLabUtil;
 import com.ppolivka.gitlabprojects.configuration.ConfigurationDialog;
 import com.ppolivka.gitlabprojects.configuration.SettingsState;
 import git4idea.GitLocalBranch;
@@ -37,6 +36,9 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+
+import static com.ppolivka.gitlabprojects.util.MessageUtil.showErrorDialog;
+import static com.ppolivka.gitlabprojects.util.MessageUtil.showInfoMessage;
 
 /**
  * Import to VCS project to gitlab
@@ -67,7 +69,7 @@ public class GitLabShareAction extends DumbAwareAction {
         BasicAction.saveAll();
 
         // get gitRepository
-        final GitRepository gitRepository = GitLabUtils.getGitRepository(project, file);
+        final GitRepository gitRepository = GitLabUtil.getGitRepository(project, file);
         final boolean gitDetected = gitRepository != null;
         final VirtualFile root = gitDetected ? gitRepository.getRoot() : project.getBaseDir();
 
@@ -83,9 +85,9 @@ public class GitLabShareAction extends DumbAwareAction {
         }
 
         if (gitDetected) {
-            final String gitLabRemoteUrl = GitLabUtils.findGitLabRemoteUrl(gitRepository);
+            final String gitLabRemoteUrl = GitLabUtil.findGitLabRemoteUrl(gitRepository);
             if (gitLabRemoteUrl != null) {
-                Messages.showInfoMessage(project, "This project already has remote to your GitLab Server", "Already Git Lab Project");
+                showInfoMessage(project, "This project already has remote to your GitLab Server", "Already Git Lab Project");
             }
         }
         GitLabShareDialog gitLabShareDialog = new GitLabShareDialog(project);
@@ -136,14 +138,14 @@ public class GitLabShareAction extends DumbAwareAction {
                 GitRepositoryManager repositoryManager = GitUtil.getRepositoryManager(project);
                 final GitRepository repository = repositoryManager.getRepositoryForRoot(root);
                 if (repository == null) {
-                    Messages.showErrorDialog(project, "Remote server was not found.", "Remote Not Found");
+                    showErrorDialog(project, "Remote server was not found.", "Remote Not Found");
                     return;
                 }
 
                 final String remoteUrl = authSsh ? gitlabProject.getSshUrl() : gitlabProject.getHttpUrl();
 
                 indicator.setText("Adding GitLAb as a remote host...");
-                if (!GitLabUtils.addGitLabRemote(project, repository, name, remoteUrl)) {
+                if (!GitLabUtil.addGitLabRemote(project, repository, name, remoteUrl)) {
                     return;
                 }
 
@@ -156,7 +158,7 @@ public class GitLabShareAction extends DumbAwareAction {
                     return;
                 }
 
-                Messages.showInfoMessage(project, "Project was shared to your GitLab server", "Project Shared");
+                showInfoMessage(project, "Project was shared to your GitLab server", "Project Shared");
 
             }
         });
@@ -194,7 +196,7 @@ public class GitLabShareAction extends DumbAwareAction {
             handler.run();
         }
         catch (VcsException e) {
-            Messages.showErrorDialog(project, "Project was create on GitLab server, but files cannot be commited to it.", "Initial Commit Failure");
+            showErrorDialog(project, "Project was create on GitLab server, but files cannot be commited to it.", "Initial Commit Failure");
             return false;
         }
         return true;
@@ -236,12 +238,12 @@ public class GitLabShareAction extends DumbAwareAction {
 
         GitLocalBranch currentBranch = repository.getCurrentBranch();
         if (currentBranch == null) {
-            Messages.showErrorDialog(project, "Project was create on GitLAb server, but cannot be pushed.", "Cannot Be Pushed");
+            showErrorDialog(project, "Project was create on GitLAb server, but cannot be pushed.", "Cannot Be Pushed");
             return false;
         }
         GitCommandResult result = git.push(repository, remoteName, remoteUrl, currentBranch.getName(), true);
         if (!result.success()) {
-            Messages.showErrorDialog(project, "Project was create on GitLab server, but cannot be pushed.", "Cannot Be Pushed");
+            showErrorDialog(project, "Project was create on GitLab server, but cannot be pushed.", "Cannot Be Pushed");
             return false;
         }
         return true;

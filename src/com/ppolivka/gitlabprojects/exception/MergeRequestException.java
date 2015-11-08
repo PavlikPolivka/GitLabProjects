@@ -1,12 +1,12 @@
 package com.ppolivka.gitlabprojects.exception;
 
 /**
- * TODO:Descibe
+ * Exception for actions related to merge requests
  *
  * @author ppolivka
  * @since 31.10.2015
  */
-public class MergeRequestException extends Exception {
+public class MergeRequestException extends Throwable {
 
     public MergeRequestException() {
     }

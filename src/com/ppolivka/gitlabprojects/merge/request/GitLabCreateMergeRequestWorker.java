@@ -4,17 +4,17 @@ import com.intellij.notification.NotificationListener;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.ThrowableComputable;
 import com.intellij.openapi.vcs.VcsNotifier;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ThrowableConvertor;
 import com.intellij.util.containers.Convertor;
-import com.ppolivka.gitlabprojects.common.GitLabUtils;
+import com.ppolivka.gitlabprojects.util.GitLabUtil;
 import com.ppolivka.gitlabprojects.configuration.ProjectState;
 import com.ppolivka.gitlabprojects.configuration.SettingsState;
 import com.ppolivka.gitlabprojects.exception.MergeRequestException;
-import com.ppolivka.gitlabprojects.merge.*;
+import com.ppolivka.gitlabprojects.merge.GitLabDiffViewWorker;
+import com.ppolivka.gitlabprojects.merge.GitLabMergeRequestWorker;
 import com.ppolivka.gitlabprojects.merge.info.BranchInfo;
 import com.ppolivka.gitlabprojects.merge.info.DiffInfo;
 import git4idea.GitLocalBranch;
@@ -31,8 +31,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.ppolivka.gitlabprojects.util.MessageUtil.showErrorDialog;
+import static com.ppolivka.gitlabprojects.util.MessageUtil.showWarningDialog;
+
 /**
- * GitLab Merge request worker
+ * GitLab Create Merge request worker
  *
  * @author ppolivka
  * @since 30.10.2015
@@ -66,7 +69,7 @@ public class GitLabCreateMergeRequestWorker implements GitLabMergeRequestWorker 
                 indicator.setText("Pushing current branch...");
                 GitCommandResult result = git.push(gitRepository, branch.getRemoteName(), remoteUrl, gitLocalBranch.getName(), true);
                 if (!result.success()) {
-                    Messages.showErrorDialog(project, "Push failed:<br/>" + result.getErrorOutputAsHtmlString(), CANNOT_CREATE_MERGE_REQUEST);
+                    showErrorDialog(project, "Push failed:<br/>" + result.getErrorOutputAsHtmlString(), CANNOT_CREATE_MERGE_REQUEST);
                     return;
                 }
 
@@ -75,7 +78,7 @@ public class GitLabCreateMergeRequestWorker implements GitLabMergeRequestWorker 
                 try {
                     mergeRequest = settingsState.api().createMergeRequest(gitlabProject, gitLocalBranch.getName(), branch.getName(), title, description);
                 } catch (IOException e) {
-                    Messages.showErrorDialog(project, "Cannot create Merge Request vis GitLab REST API", CANNOT_CREATE_MERGE_REQUEST);
+                    showErrorDialog(project, "Cannot create Merge Request vis GitLab REST API", CANNOT_CREATE_MERGE_REQUEST);
                     return;
                 }
                 VcsNotifier.getInstance(project)
@@ -99,17 +102,17 @@ public class GitLabCreateMergeRequestWorker implements GitLabMergeRequestWorker 
 
     public boolean checkAction(@Nullable final BranchInfo branch) {
         if (branch == null) {
-            Messages.showWarningDialog(project, "Target branch is not selected", CANNOT_CREATE_MERGE_REQUEST);
+            showWarningDialog(project, "Target branch is not selected", CANNOT_CREATE_MERGE_REQUEST);
             return false;
         }
 
         DiffInfo info;
         try {
-            info = GitLabUtils
+            info = GitLabUtil
                     .computeValueInModal(project, "Collecting diff data...", new ThrowableConvertor<ProgressIndicator, DiffInfo, IOException>() {
                         @Override
                         public DiffInfo convert(ProgressIndicator indicator) throws IOException {
-                            return GitLabUtils.runInterruptable(indicator, new ThrowableComputable<DiffInfo, IOException>() {
+                            return GitLabUtil.runInterruptable(indicator, new ThrowableComputable<DiffInfo, IOException>() {
                                 @Override
                                 public DiffInfo compute() throws IOException {
                                     return diffViewWorker.getDiffInfo(localBranchInfo, branch);
@@ -118,7 +121,7 @@ public class GitLabCreateMergeRequestWorker implements GitLabMergeRequestWorker 
                         }
                     });
         } catch (IOException e) {
-            Messages.showErrorDialog(project, "Can't collect diff data", CANNOT_CREATE_MERGE_REQUEST);
+            showErrorDialog(project, "Can't collect diff data", CANNOT_CREATE_MERGE_REQUEST);
             return true;
         }
         if (info == null) {
@@ -128,13 +131,13 @@ public class GitLabCreateMergeRequestWorker implements GitLabMergeRequestWorker 
         String localBranchName = "'" + gitLocalBranch.getName() + "'";
         String targetBranchName = "'" + branch.getRemoteName() + "/" + branch.getName() + "'";
         if (info.getInfo().getBranchToHeadCommits(gitRepository).isEmpty()) {
-            return GitLabUtils
+            return GitLabUtil
                     .showYesNoDialog(project, "Empty Pull Request",
                             "The branch " + localBranchName + " is fully merged to the branch " + targetBranchName + '\n' +
                                     "Do you want to proceed anyway?");
         }
         if (!info.getInfo().getHeadToBranchCommits(gitRepository).isEmpty()) {
-            return GitLabUtils
+            return GitLabUtil
                     .showYesNoDialog(project, "Target Branch Is Not Fully Merged",
                             "The branch " + targetBranchName + " is not fully merged to the branch " + localBranchName + '\n' +
                                     "Do you want to proceed anyway?");
@@ -145,7 +148,7 @@ public class GitLabCreateMergeRequestWorker implements GitLabMergeRequestWorker 
 
 
     public static GitLabCreateMergeRequestWorker create(@NotNull final Project project, @Nullable final VirtualFile file) {
-        return GitLabUtils.computeValueInModal(project, "Loading data...", new Convertor<ProgressIndicator, GitLabCreateMergeRequestWorker>() {
+        return GitLabUtil.computeValueInModal(project, "Loading data...", new Convertor<ProgressIndicator, GitLabCreateMergeRequestWorker>() {
 
             @Override
             public GitLabCreateMergeRequestWorker convert(ProgressIndicator indicator) {
@@ -160,7 +163,7 @@ public class GitLabCreateMergeRequestWorker implements GitLabMergeRequestWorker 
                 //region Additional fields
                 GitLocalBranch currentBranch = mergeRequestWorker.getGitRepository().getCurrentBranch();
                 if (currentBranch == null) {
-                    Messages.showErrorDialog(project, "No current branch", CANNOT_CREATE_MERGE_REQUEST);
+                    showErrorDialog(project, "No current branch", CANNOT_CREATE_MERGE_REQUEST);
                     return null;
                 }
                 mergeRequestWorker.setGitLocalBranch(currentBranch);
@@ -179,7 +182,7 @@ public class GitLabCreateMergeRequestWorker implements GitLabMergeRequestWorker 
                     }
                     mergeRequestWorker.setBranches(branchInfos);
                 } catch (Exception e) {
-                    Messages.showErrorDialog(project, "Cannot list GitLab branches", CANNOT_CREATE_MERGE_REQUEST);
+                    showErrorDialog(project, "Cannot list GitLab branches", CANNOT_CREATE_MERGE_REQUEST);
                     return null;
                 }
 
@@ -194,28 +197,64 @@ public class GitLabCreateMergeRequestWorker implements GitLabMergeRequestWorker 
     }
 
     //region Getters & Setters
+    @Override
     public Git getGit() {
         return git;
     }
 
+    @Override
+    public void setGit(Git git) {
+        this.git = git;
+    }
+
+    @Override
     public Project getProject() {
         return project;
     }
 
+    @Override
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    @Override
     public ProjectState getProjectState() {
         return projectState;
     }
 
+    @Override
+    public void setProjectState(ProjectState projectState) {
+        this.projectState = projectState;
+    }
+
+    @Override
     public GitRepository getGitRepository() {
         return gitRepository;
     }
 
+    @Override
+    public void setGitRepository(GitRepository gitRepository) {
+        this.gitRepository = gitRepository;
+    }
+
+    @Override
     public String getRemoteUrl() {
         return remoteUrl;
     }
 
+    @Override
+    public void setRemoteUrl(String remoteUrl) {
+        this.remoteUrl = remoteUrl;
+    }
+
+    @Override
     public GitlabProject getGitlabProject() {
         return gitlabProject;
+    }
+
+    @Override
+    public void setGitlabProject(GitlabProject gitlabProject) {
+        this.gitlabProject = gitlabProject;
     }
 
     @Override
@@ -223,33 +262,19 @@ public class GitLabCreateMergeRequestWorker implements GitLabMergeRequestWorker 
         return remoteProjectName;
     }
 
-    public void setGit(Git git) {
-        this.git = git;
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
-    }
-
-    public void setProjectState(ProjectState projectState) {
-        this.projectState = projectState;
-    }
-
-    public void setGitRepository(GitRepository gitRepository) {
-        this.gitRepository = gitRepository;
-    }
-
-    public void setRemoteUrl(String remoteUrl) {
-        this.remoteUrl = remoteUrl;
-    }
-
-    public void setGitlabProject(GitlabProject gitlabProject) {
-        this.gitlabProject = gitlabProject;
-    }
-
     @Override
     public void setRemoteProjectName(String remoteProjectName) {
         this.remoteProjectName = remoteProjectName;
+    }
+
+    @Override
+    public GitLabDiffViewWorker getDiffViewWorker() {
+        return diffViewWorker;
+    }
+
+    @Override
+    public void setDiffViewWorker(GitLabDiffViewWorker diffViewWorker) {
+        this.diffViewWorker = diffViewWorker;
     }
 
     public GitLocalBranch getGitLocalBranch() {
@@ -283,13 +308,6 @@ public class GitLabCreateMergeRequestWorker implements GitLabMergeRequestWorker 
     public void setLastUsedBranch(BranchInfo lastUsedBranch) {
         this.lastUsedBranch = lastUsedBranch;
     }
-
-    public GitLabDiffViewWorker getDiffViewWorker() {
-        return diffViewWorker;
-    }
-
-    public void setDiffViewWorker(GitLabDiffViewWorker diffViewWorker) {
-        this.diffViewWorker = diffViewWorker;
-    }
     //endregion
+
 }

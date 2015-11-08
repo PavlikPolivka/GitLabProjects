@@ -4,7 +4,7 @@ import git4idea.util.GitCommitCompareInfo;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * TODO:Descibe
+ * Class containing info about diff
  *
  * @author ppolivka
  * @since 31.10.2015
