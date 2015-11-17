@@ -2,8 +2,6 @@ package com.ppolivka.gitlabprojects.configuration;
 
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.ppolivka.gitlabprojects.common.EditableView;
 import org.jetbrains.annotations.Nls;
@@ -30,9 +28,9 @@ import static org.apache.commons.lang.StringUtils.isNotBlank;
  * @author ppolivka
  * @since 27.10.2015
  */
-public class ConfigurationDialog extends DialogWrapper implements SearchableConfigurable, EditableView<SettingsState, String[]> {
+public class SettingsView implements SearchableConfigurable, EditableView<SettingsState, String[]> {
 
-    private static final String DIALOG_TITLE = "GitLab Settings";
+    public static final String DIALOG_TITLE = "GitLab Settings";
     SettingsState settingsState = SettingsState.getInstance();
 
     private JPanel mainPanel;
@@ -40,23 +38,7 @@ public class ConfigurationDialog extends DialogWrapper implements SearchableConf
     private JTextField textAPI;
     private JButton apiHelpButton;
 
-    public ConfigurationDialog(@NotNull Component parent, boolean canBeParent) {
-        super(parent, canBeParent);
-        init();
-    }
-
-    public ConfigurationDialog(@Nullable Project project) {
-        super(project);
-        init();
-    }
-
-    //region Dialog Wrapper Override methods
-    @Override
-    protected void init() {
-        super.init();
-        setTitle(DIALOG_TITLE);
-        setSize(600, 300);
-        setAutoAdjustable(false);
+    public void setup() {
         onServerChange();
         textHost.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -83,14 +65,7 @@ public class ConfigurationDialog extends DialogWrapper implements SearchableConf
     }
 
     @Nullable
-    @Override
-    protected JComponent createCenterPanel() {
-        return createComponent();
-    }
-
-    @Nullable
-    @Override
-    protected ValidationInfo doValidate() {
+    public ValidationInfo doValidate() {
         final String hostText = textHost.getText();
         final String apiText = textAPI.getText();
         try {
@@ -112,13 +87,12 @@ public class ConfigurationDialog extends DialogWrapper implements SearchableConf
         }
         return null;
     }
-    //endregion
 
     //region Searchable Configurable interface methods
     @NotNull
     @Override
     public String getId() {
-        return this.getClass().getName();
+        return DIALOG_TITLE;
     }
 
     @Nullable

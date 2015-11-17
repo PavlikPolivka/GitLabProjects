@@ -18,7 +18,7 @@ import com.intellij.util.containers.ContainerUtil;
 import com.ppolivka.gitlabprojects.api.dto.NamespaceDto;
 import com.ppolivka.gitlabprojects.common.GitLabIcons;
 import com.ppolivka.gitlabprojects.common.GitLabUtils;
-import com.ppolivka.gitlabprojects.configuration.ConfigurationDialog;
+import com.ppolivka.gitlabprojects.configuration.SettingsDialog;
 import com.ppolivka.gitlabprojects.configuration.SettingsState;
 import git4idea.GitLocalBranch;
 import git4idea.GitUtil;
@@ -75,7 +75,7 @@ public class GitLabShareAction extends DumbAwareAction {
             settingsState.isApiValid(settingsState.host, settingsState.token);
         } catch (Exception e) {
             //Git Lab Not configured
-            ConfigurationDialog configurationDialog = new ConfigurationDialog(project);
+            SettingsDialog configurationDialog = new SettingsDialog(project);
             configurationDialog.show();
             if (!configurationDialog.isOK()) {
                 return;
