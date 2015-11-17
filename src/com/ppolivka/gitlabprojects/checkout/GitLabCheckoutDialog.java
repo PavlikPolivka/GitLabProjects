@@ -14,7 +14,7 @@ import com.intellij.ui.JBColor;
 import com.intellij.util.ui.JBImageIcon;
 import com.ppolivka.gitlabprojects.api.dto.ProjectDto;
 import com.ppolivka.gitlabprojects.common.GitLabIcons;
-import com.ppolivka.gitlabprojects.configuration.ConfigurationDialog;
+import com.ppolivka.gitlabprojects.configuration.SettingsDialog;
 import com.ppolivka.gitlabprojects.configuration.SettingsState;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,7 +47,7 @@ public class GitLabCheckoutDialog extends DialogWrapper {
 
     private SettingsState settingsState = SettingsState.getInstance();
 
-    private ConfigurationDialog configurationDialog;
+    private SettingsDialog configurationDialog;
     private String lastUsedUrl = "";
     private Project project;
     private ActionListener settingsDialogActionListener;
@@ -75,7 +75,7 @@ public class GitLabCheckoutDialog extends DialogWrapper {
         settingsDialogActionListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                configurationDialog = new ConfigurationDialog(getContentPane(), false);
+                configurationDialog = new SettingsDialog(getContentPane(), false);
                 configurationDialog.show();
                 if(configurationDialog.isOK() && configurationDialog.isModified()){
                     try {

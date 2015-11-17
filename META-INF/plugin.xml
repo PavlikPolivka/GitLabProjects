@@ -16,6 +16,9 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <br><b>18. 11. 2016</b></br>
+        Fix for exception occurring during double shift search<br>
+
         <br><b>6. 11. 2016</b></br>
         Create Merge Request dialog fix<br>
 
