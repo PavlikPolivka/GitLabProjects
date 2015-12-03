@@ -1,6 +1,8 @@
 ## GitLab Projects
 Simple plugin that is adding support for GitLab specific actions to JetBrain IDEs
 
+[![ZenHub] (https://raw.githubusercontent.com/ZenHubIO/support/master/zenhub-badge.png)] (https://zenhub.io)
+
 ### Features:
 * **GitLab Checkout dialog** - list all users projects on GitLab and provides quick way to clone them locally
 * **GitLab Share dialog** - allows quick import of new projects to GitLab, user can specify namespace and project visibility
