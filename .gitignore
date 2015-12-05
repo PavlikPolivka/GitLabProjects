@@ -3,10 +3,13 @@
 ### JetBrains template
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio
 
-*.iml
+/.idea/findbugs-idea.xml
+/.idea/checkstyle-idea.xml
+/.idea/shelf
+
 
 ## Directory-based project format:
-.idea/
+
 # if you remove the above rule, at least ignore the following:
 
 # User-specific stuff:
