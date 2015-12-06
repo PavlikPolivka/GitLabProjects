@@ -3,6 +3,7 @@ package com.ppolivka.gitlabprojects.share;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -79,6 +80,13 @@ public class GitLabShareAction extends DumbAwareAction {
             //Git Lab Not configured
             SettingsDialog configurationDialog = new SettingsDialog(project);
             configurationDialog.show();
+            if(configurationDialog.isOK() && configurationDialog.isModified()){
+                try {
+                    configurationDialog.apply();
+                } catch (ConfigurationException ignored) {
+                    return;
+                }
+            }
             if (!configurationDialog.isOK()) {
                 return;
             }
