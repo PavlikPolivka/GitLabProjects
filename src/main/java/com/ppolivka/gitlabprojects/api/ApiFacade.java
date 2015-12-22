@@ -2,6 +2,7 @@ package com.ppolivka.gitlabprojects.api;
 
 import com.ppolivka.gitlabprojects.api.dto.NamespaceDto;
 import org.gitlab.api.GitlabAPI;
+import org.gitlab.api.http.GitlabHTTPRequestor;
 import org.gitlab.api.models.*;
 
 import java.io.IOException;
@@ -57,6 +58,13 @@ public class ApiFacade {
                 .with("target_branch", to)
                 .with("title", title)
                 .with("description", description).to(tailUrl, GitlabMergeRequest.class);}
+
+    public void acceptMergeRequest(GitlabProject project, GitlabMergeRequest mergeRequest, boolean removeSourceBranch) throws IOException {
+        String tailUrl = "/projects/"+project.getId()+ "/merge_request/"+mergeRequest.getId()+"/merge";
+        GitlabHTTPRequestor requestor = api.retrieve().method("PUT");
+        requestor.with("should_remove_source_branch", removeSourceBranch);
+        requestor.to(tailUrl, mergeRequest);
+    }
 
     public GitlabProject createProject(String name, int visibilityLevel, boolean isPublic, NamespaceDto namespace, String description) throws IOException {
         return api.createProject(

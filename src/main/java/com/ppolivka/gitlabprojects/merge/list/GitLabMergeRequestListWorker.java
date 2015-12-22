@@ -1,15 +1,18 @@
 package com.ppolivka.gitlabprojects.merge.list;
 
+import com.intellij.notification.NotificationListener;
 import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vcs.VcsNotifier;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.containers.Convertor;
-import com.ppolivka.gitlabprojects.util.GitLabUtil;
 import com.ppolivka.gitlabprojects.configuration.ProjectState;
 import com.ppolivka.gitlabprojects.configuration.SettingsState;
 import com.ppolivka.gitlabprojects.exception.MergeRequestException;
 import com.ppolivka.gitlabprojects.merge.GitLabDiffViewWorker;
 import com.ppolivka.gitlabprojects.merge.GitLabMergeRequestWorker;
+import com.ppolivka.gitlabprojects.util.GitLabUtil;
 import git4idea.commands.Git;
 import git4idea.repo.GitRepository;
 import org.gitlab.api.models.GitlabMergeRequest;
@@ -25,7 +28,7 @@ import static com.ppolivka.gitlabprojects.merge.GitLabMergeRequestWorker.Util.fi
 import static com.ppolivka.gitlabprojects.util.MessageUtil.showErrorDialog;
 
 /**
- * TODO:Descibe
+ * Worker for listing and accepting merge request
  *
  * @author ppolivka
  * @since 31.10.2015
@@ -44,6 +47,21 @@ public class GitLabMergeRequestListWorker implements GitLabMergeRequestWorker {
     private GitLabDiffViewWorker diffViewWorker;
 
     private List<GitlabMergeRequest> mergeRequests;
+
+    public void mergeBranches(final Project project, final GitlabMergeRequest mergeRequest, final boolean removeSource) {
+        new Task.Backgroundable(project, "Merging Branches...") {
+            @Override
+            public void run(@NotNull ProgressIndicator indicator) {
+                try {
+                    settingsState.api().acceptMergeRequest(gitlabProject, mergeRequest, removeSource);
+                    VcsNotifier.getInstance(project)
+                            .notifyImportantInfo("Merged", "Merge request is merged.", NotificationListener.URL_OPENING_LISTENER);
+                } catch (IOException e) {
+                    showErrorDialog(project, "Cannot create merge this request", "Cannot Merge");
+                }
+            }
+        }.queue();
+    }
 
 
     public static GitLabMergeRequestListWorker create(@NotNull final Project project, @Nullable final VirtualFile file) {
