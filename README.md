@@ -7,6 +7,7 @@ Simple plugin that is adding support for GitLab specific actions to JetBrain IDE
 * **GitLab Checkout dialog** - list all users projects on GitLab and provides quick way to clone them locally
 * **GitLab Share dialog** - allows quick import of new projects to GitLab, user can specify namespace and project visibility
 * **GitLab Merge Request dialog**  - user can quickly create new merge requests from current branch
+* **GitLab Merge Request List dialog**  - user can list and accept all open code reviews
 
 ### Changelist:
 - **1.3.0**
