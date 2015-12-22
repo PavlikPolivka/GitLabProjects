@@ -58,6 +58,12 @@ public abstract class GitLabApiAction extends DumbAwareAction {
         apiValidAction(anActionEvent);
     }
 
+    /**
+     * Abstract method that is called after GitLab Api is validated,
+     * we can assume that login credentials are there and api valid
+     *
+     * @param anActionEvent event information
+     */
     public abstract void apiValidAction(AnActionEvent anActionEvent);
 
     /**

@@ -54,6 +54,11 @@ public class GitLabShareAction extends GitLabApiAction {
 
     @Override
     public void apiValidAction(AnActionEvent anActionEvent) {
+
+        if (project.isDisposed()) {
+            return;
+        }
+
         shareProjectOnGitLab(project, file);
     }
 
@@ -73,7 +78,7 @@ public class GitLabShareAction extends GitLabApiAction {
         }
         GitLabShareDialog gitLabShareDialog = new GitLabShareDialog(project);
         gitLabShareDialog.show();
-        if(!gitLabShareDialog.isOK()) {
+        if (!gitLabShareDialog.isOK()) {
             return;
         }
         final String name = gitLabShareDialog.getProjectName().getText();
@@ -81,10 +86,10 @@ public class GitLabShareAction extends GitLabApiAction {
         final NamespaceDto namespace = (NamespaceDto) gitLabShareDialog.getGroupList().getSelectedItem();
         int visibility_level = 10;
         boolean isPublic = false;
-        if(gitLabShareDialog.getIsPrivate().isSelected()) {
-             visibility_level = 0;
+        if (gitLabShareDialog.getIsPrivate().isSelected()) {
+            visibility_level = 0;
         }
-        if(gitLabShareDialog.getIsPublic().isSelected()) {
+        if (gitLabShareDialog.getIsPublic().isSelected()) {
             visibility_level = 20;
             isPublic = true;
         }
@@ -92,7 +97,7 @@ public class GitLabShareAction extends GitLabApiAction {
         final boolean publicity = isPublic;
 
         boolean isSsh = true;
-        if(gitLabShareDialog.getIsHTTPAuth().isSelected()) {
+        if (gitLabShareDialog.getIsHTTPAuth().isSelected()) {
             isSsh = false;
         }
         final boolean authSsh = isSsh;
@@ -109,7 +114,7 @@ public class GitLabShareAction extends GitLabApiAction {
                     return;
                 }
 
-                if(!gitDetected) {
+                if (!gitDetected) {
                     indicator.setText("Creating empty git repo...");
                     if (!createEmptyGitRepository(project, root, indicator)) {
                         return;
@@ -175,8 +180,7 @@ public class GitLabShareAction extends GitLabApiAction {
             handler.addParameters("-m", commitMessage);
             handler.endOptions();
             handler.run();
-        }
-        catch (VcsException e) {
+        } catch (VcsException e) {
             showErrorDialog(project, "Project was create on GitLab server, but files cannot be commited to it.", "Initial Commit Failure");
             return false;
         }
