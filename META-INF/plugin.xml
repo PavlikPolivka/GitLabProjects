@@ -16,27 +16,28 @@
     ]]></description>
 
     <change-notes><![CDATA[
-        <br><b>31. 12. 2015</b></br>
+        <br><b>1.3.0</b></br>
+        <b>Added support for listing and accepting merge requests</b><br>
         GitLab Menu group moved to Git section, this way its only visible if there is Git defined in a project.<br>
         Unified checks for GitLab API Settings,now runs in background Modal dialog<br>
 
-        <br><b>6. 12. 2015</b></br>
+        <br><b>1.2.3</b></br>
         Fix for Share Dialog NPE<br>
 
-        <br><b>18. 11. 2015</b></br>
+        <br><b>1.2.2</b></br>
         Fix for exception occurring during double shift search<br>
 
-        <br><b>6. 11. 2015</b></br>
+        <br><b>1.2.1</b></br>
         Create Merge Request dialog fix<br>
 
-        <br><b>2. 11. 2015</b><br>
+        <br><b>1.2.0</b><br>
         New GitLab logo<br>
         Add Create Merge Request Dialog<br>
 
-        <br><b>28. 9. 2015</b><br>
+        <br><b>1.1.0</b><br>
         Added support for Import to VCS<br>
 
-        <br><b>10. 9. 2015</b><br>
+        <br><b>1.0.0</b><br>
         Added support for GitLab Checkout Dialog<br>
     ]]>
     </change-notes>
