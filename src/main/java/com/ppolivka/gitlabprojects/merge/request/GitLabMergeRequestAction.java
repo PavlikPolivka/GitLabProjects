@@ -3,9 +3,9 @@ package com.ppolivka.gitlabprojects.merge.request;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.ppolivka.gitlabprojects.common.GitLabApiAction;
 import com.ppolivka.gitlabprojects.util.GitLabUtil;
 import git4idea.DialogManager;
 
@@ -15,7 +15,7 @@ import git4idea.DialogManager;
  * @author ppolivka
  * @since 30.10.2015
  */
-public class GitLabMergeRequestAction extends DumbAwareAction {
+public class GitLabMergeRequestAction extends GitLabApiAction {
 
     public GitLabMergeRequestAction() {
         super("Create _Merge Request", "Creates merge request from current branch", AllIcons.Vcs.Merge);
@@ -27,6 +27,10 @@ public class GitLabMergeRequestAction extends DumbAwareAction {
         final VirtualFile file = anActionEvent.getData(CommonDataKeys.VIRTUAL_FILE);
 
         if (project == null || project.isDisposed() || !GitLabUtil.testGitExecutable(project)) {
+            return;
+        }
+
+        if(!validateGitLabApi(project)) {
             return;
         }
 

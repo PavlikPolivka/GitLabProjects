@@ -4,12 +4,9 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-
-import java.awt.*;
 
 import static com.ppolivka.gitlabprojects.configuration.SettingsView.DIALOG_TITLE;
 
@@ -25,11 +22,6 @@ public class SettingsDialog extends DialogWrapper {
 
     public SettingsDialog(@Nullable Project project) {
         super(project);
-        init();
-    }
-
-    public SettingsDialog(@NotNull Component parent, boolean canBeParent) {
-        super(parent, canBeParent);
         init();
     }
 

@@ -16,6 +16,9 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <br><b>31. 12. 2015</b></br>
+        Unified checks for GitLab API Settings,now runs in background Modal dialog<br>
+
         <br><b>6. 12. 2015</b></br>
         Fix for Share Dialog NPE<br>
 
