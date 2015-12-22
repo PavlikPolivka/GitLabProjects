@@ -1,9 +1,6 @@
 package com.ppolivka.gitlabprojects.checkout;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationType;
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
@@ -16,6 +13,7 @@ import com.ppolivka.gitlabprojects.api.dto.ProjectDto;
 import com.ppolivka.gitlabprojects.common.GitLabIcons;
 import com.ppolivka.gitlabprojects.configuration.SettingsDialog;
 import com.ppolivka.gitlabprojects.configuration.SettingsState;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -31,6 +29,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.intellij.ui.JBColor.WHITE;
+import static com.ppolivka.gitlabprojects.common.GitLabApiAction.validateGitLabApi;
+import static com.ppolivka.gitlabprojects.util.MessageUtil.showErrorDialog;
 
 /**
  * Dialog displayed when checking out new project
@@ -57,6 +57,7 @@ public class GitLabCheckoutDialog extends DialogWrapper {
 
     public GitLabCheckoutDialog(@Nullable Project project) {
         super(project);
+        this.project = project;
         init();
     }
 
@@ -75,7 +76,7 @@ public class GitLabCheckoutDialog extends DialogWrapper {
         settingsDialogActionListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                configurationDialog = new SettingsDialog(getContentPane(), false);
+                configurationDialog = new SettingsDialog(project);
                 configurationDialog.show();
                 if(configurationDialog.isOK() && configurationDialog.isModified()){
                     try {
@@ -139,26 +140,18 @@ public class GitLabCheckoutDialog extends DialogWrapper {
     }
 
     private void refreshTree() {
+        if(!validateGitLabApi(project)) {
+            return;
+        }
         treeLoading();
-        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Refreshing tree..") {
-            boolean isError = false;
-
+        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Refreshing Tree..") {
             @Override
-            public void run(ProgressIndicator progressIndicator) {
+            public void run(@NotNull ProgressIndicator progressIndicator) {
                 try {
                     settingsState.reloadProjects();
                     reDrawTree(settingsState.getProjects());
                 } catch (Throwable e) {
-                    Notifications.Bus.notify(new Notification("GitLab Projects Plugin", "Tree Refresh", "Tree refreshing failed, plese correct your plugin settings.", NotificationType.ERROR));
-                    isError = true;
-                }
-            }
-
-            @Override
-            public void onSuccess() {
-                super.onSuccess();
-                if(isError) {
-                    settingsDialogActionListener.actionPerformed(null);
+                    showErrorDialog(project, "Cannot log-in to GitLab Server with provided token", "Cannot Login To GitLab");
                 }
             }
         });

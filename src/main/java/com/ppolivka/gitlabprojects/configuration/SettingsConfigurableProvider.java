@@ -15,7 +15,9 @@ public class SettingsConfigurableProvider extends ConfigurableProvider {
     @Nullable
     @Override
     public Configurable createConfigurable() {
-        return new SettingsView();
+        SettingsView settingsView = new SettingsView();
+        settingsView.setup();
+        return settingsView;
     }
 
 }

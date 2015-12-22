@@ -1,13 +1,10 @@
 package com.ppolivka.gitlabprojects.share;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.components.ServiceManager;
-import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.vcs.ProjectLevelVcsManager;
@@ -16,10 +13,10 @@ import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.containers.ContainerUtil;
 import com.ppolivka.gitlabprojects.api.dto.NamespaceDto;
+import com.ppolivka.gitlabprojects.common.GitLabApiAction;
 import com.ppolivka.gitlabprojects.common.GitLabIcons;
-import com.ppolivka.gitlabprojects.util.GitLabUtil;
-import com.ppolivka.gitlabprojects.configuration.SettingsDialog;
 import com.ppolivka.gitlabprojects.configuration.SettingsState;
+import com.ppolivka.gitlabprojects.util.GitLabUtil;
 import git4idea.GitLocalBranch;
 import git4idea.GitUtil;
 import git4idea.actions.BasicAction;
@@ -47,7 +44,7 @@ import static com.ppolivka.gitlabprojects.util.MessageUtil.showInfoMessage;
  * @author ppolivka
  * @since 28.10.2015
  */
-public class GitLabShareAction extends DumbAwareAction {
+public class GitLabShareAction extends GitLabApiAction {
 
     private static SettingsState settingsState = SettingsState.getInstance();
 
@@ -56,41 +53,22 @@ public class GitLabShareAction extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(AnActionEvent anActionEvent) {
-        final Project project = anActionEvent.getData(CommonDataKeys.PROJECT);
-        final VirtualFile file = anActionEvent.getData(CommonDataKeys.VIRTUAL_FILE);
+    public void apiValidAction(AnActionEvent anActionEvent) {
 
-        if (project == null || project.isDisposed()) {
+        if (project.isDisposed()) {
             return;
         }
+
         shareProjectOnGitLab(project, file);
     }
 
-    public static void shareProjectOnGitLab(@NotNull final Project project, @Nullable final VirtualFile file) {
+    public void shareProjectOnGitLab(@NotNull final Project project, @Nullable final VirtualFile file) {
         BasicAction.saveAll();
 
         // get gitRepository
         final GitRepository gitRepository = GitLabUtil.getGitRepository(project, file);
         final boolean gitDetected = gitRepository != null;
         final VirtualFile root = gitDetected ? gitRepository.getRoot() : project.getBaseDir();
-
-        try {
-            settingsState.isApiValid(settingsState.host, settingsState.token);
-        } catch (Exception e) {
-            //Git Lab Not configured
-            SettingsDialog configurationDialog = new SettingsDialog(project);
-            configurationDialog.show();
-            if(configurationDialog.isOK() && configurationDialog.isModified()){
-                try {
-                    configurationDialog.apply();
-                } catch (ConfigurationException ignored) {
-                    return;
-                }
-            }
-            if (!configurationDialog.isOK()) {
-                return;
-            }
-        }
 
         if (gitDetected) {
             final String gitLabRemoteUrl = GitLabUtil.findGitLabRemoteUrl(gitRepository);
@@ -100,7 +78,7 @@ public class GitLabShareAction extends DumbAwareAction {
         }
         GitLabShareDialog gitLabShareDialog = new GitLabShareDialog(project);
         gitLabShareDialog.show();
-        if(!gitLabShareDialog.isOK()) {
+        if (!gitLabShareDialog.isOK()) {
             return;
         }
         final String name = gitLabShareDialog.getProjectName().getText();
@@ -108,10 +86,10 @@ public class GitLabShareAction extends DumbAwareAction {
         final NamespaceDto namespace = (NamespaceDto) gitLabShareDialog.getGroupList().getSelectedItem();
         int visibility_level = 10;
         boolean isPublic = false;
-        if(gitLabShareDialog.getIsPrivate().isSelected()) {
-             visibility_level = 0;
+        if (gitLabShareDialog.getIsPrivate().isSelected()) {
+            visibility_level = 0;
         }
-        if(gitLabShareDialog.getIsPublic().isSelected()) {
+        if (gitLabShareDialog.getIsPublic().isSelected()) {
             visibility_level = 20;
             isPublic = true;
         }
@@ -119,7 +97,7 @@ public class GitLabShareAction extends DumbAwareAction {
         final boolean publicity = isPublic;
 
         boolean isSsh = true;
-        if(gitLabShareDialog.getIsHTTPAuth().isSelected()) {
+        if (gitLabShareDialog.getIsHTTPAuth().isSelected()) {
             isSsh = false;
         }
         final boolean authSsh = isSsh;
@@ -136,7 +114,7 @@ public class GitLabShareAction extends DumbAwareAction {
                     return;
                 }
 
-                if(!gitDetected) {
+                if (!gitDetected) {
                     indicator.setText("Creating empty git repo...");
                     if (!createEmptyGitRepository(project, root, indicator)) {
                         return;
@@ -202,8 +180,7 @@ public class GitLabShareAction extends DumbAwareAction {
             handler.addParameters("-m", commitMessage);
             handler.endOptions();
             handler.run();
-        }
-        catch (VcsException e) {
+        } catch (VcsException e) {
             showErrorDialog(project, "Project was create on GitLab server, but files cannot be commited to it.", "Initial Commit Failure");
             return false;
         }

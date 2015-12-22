@@ -40,6 +40,7 @@ import static com.ppolivka.gitlabprojects.util.MessageUtil.showErrorDialog;
  * @author ppolivka
  * @since 28.10.2015
  */
+@SuppressWarnings("Duplicates")
 public class GitLabUtil {
 
     private static SettingsState settingsState = SettingsState.getInstance();
@@ -133,8 +134,7 @@ public class GitLabUtil {
         final GitVersion version;
         try {
             version = GitVersion.identifyVersion(executable);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             showErrorDialog(project, "Cannot find git executable.", "Cannot Find Git");
             return false;
         }
@@ -155,17 +155,22 @@ public class GitLabUtil {
             public void run(@NotNull ProgressIndicator indicator) {
                 try {
                     dataRef.set(task.convert(indicator));
-                }
-                catch (Throwable e) {
+                } catch (Throwable e) {
                     exceptionRef.set(e);
                 }
             }
         });
         if (!exceptionRef.isNull()) {
             Throwable e = exceptionRef.get();
-            if (e instanceof IOException) throw ((IOException)e);
-            if (e instanceof RuntimeException) throw ((RuntimeException)e);
-            if (e instanceof Error) throw ((Error)e);
+            if (e instanceof IOException) {
+                throw ((IOException) e);
+            }
+            if (e instanceof RuntimeException) {
+                throw ((RuntimeException) e);
+            }
+            if (e instanceof Error) {
+                throw ((Error) e);
+            }
             throw new RuntimeException(e);
         }
         return dataRef.get();
@@ -213,9 +218,10 @@ public class GitLabUtil {
             future = addCancellationListener(indicator, thread);
 
             return task.compute();
-        }
-        finally {
-            if (future != null) future.cancel(true);
+        } finally {
+            if (future != null) {
+                future.cancel(true);
+            }
             Thread.interrupted();
         }
     }
@@ -226,7 +232,9 @@ public class GitLabUtil {
         return addCancellationListener(new Runnable() {
             @Override
             public void run() {
-                if (indicator.isCanceled()) thread.interrupt();
+                if (indicator.isCanceled()) {
+                    thread.interrupt();
+                }
             }
         });
     }
