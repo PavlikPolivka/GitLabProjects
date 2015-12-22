@@ -17,6 +17,7 @@
 
     <change-notes><![CDATA[
         <br><b>31. 12. 2015</b></br>
+        GitLab Menu group moved to Git section, this way its only visible if there is Git defined in a project.<br>
         Unified checks for GitLab API Settings,now runs in background Modal dialog<br>
 
         <br><b>6. 12. 2015</b></br>
@@ -77,7 +78,8 @@
             <action id="Gitlab.Create.Merge.Request" class="com.ppolivka.gitlabprojects.merge.request.GitLabMergeRequestAction"/>
             <action id="Gitlab.Create.Merge.Request.List" class="com.ppolivka.gitlabprojects.merge.list.GitLabMergeRequestListAction"/>
 
-            <add-to-group group-id="VcsGlobalGroup" anchor="after" relative-to-action="Git.Menu"/>
+            <add-to-group group-id="Git.Menu"/>
+            <add-to-group group-id="Git.ContextMenu"/>
         </group>
     </actions>
 
