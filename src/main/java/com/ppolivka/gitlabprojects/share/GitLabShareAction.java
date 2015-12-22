@@ -1,7 +1,6 @@
 package com.ppolivka.gitlabprojects.share;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
@@ -54,13 +53,7 @@ public class GitLabShareAction extends GitLabApiAction {
     }
 
     @Override
-    public void actionPerformed(AnActionEvent anActionEvent) {
-        final Project project = anActionEvent.getData(CommonDataKeys.PROJECT);
-        final VirtualFile file = anActionEvent.getData(CommonDataKeys.VIRTUAL_FILE);
-
-        if (project == null || project.isDisposed()) {
-            return;
-        }
+    public void apiValidAction(AnActionEvent anActionEvent) {
         shareProjectOnGitLab(project, file);
     }
 
@@ -71,10 +64,6 @@ public class GitLabShareAction extends GitLabApiAction {
         final GitRepository gitRepository = GitLabUtil.getGitRepository(project, file);
         final boolean gitDetected = gitRepository != null;
         final VirtualFile root = gitDetected ? gitRepository.getRoot() : project.getBaseDir();
-
-        if(!validateGitLabApi(project)) {
-            return;
-        }
 
         if (gitDetected) {
             final String gitLabRemoteUrl = GitLabUtil.findGitLabRemoteUrl(gitRepository);

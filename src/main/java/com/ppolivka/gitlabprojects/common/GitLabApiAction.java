@@ -1,9 +1,12 @@
 package com.ppolivka.gitlabprojects.common;
 
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.containers.Convertor;
 import com.ppolivka.gitlabprojects.configuration.SettingsDialog;
 import com.ppolivka.gitlabprojects.configuration.SettingsState;
@@ -25,6 +28,9 @@ public abstract class GitLabApiAction extends DumbAwareAction {
 
     protected static SettingsState settingsState = SettingsState.getInstance();
 
+    protected Project project;
+    protected VirtualFile file;
+
     public GitLabApiAction() {
     }
 
@@ -35,6 +41,24 @@ public abstract class GitLabApiAction extends DumbAwareAction {
     public GitLabApiAction(@Nullable String text, @Nullable String description, @Nullable Icon icon) {
         super(text, description, icon);
     }
+
+    @Override
+    public void actionPerformed(AnActionEvent anActionEvent) {
+        project = anActionEvent.getData(CommonDataKeys.PROJECT);
+        file = anActionEvent.getData(CommonDataKeys.VIRTUAL_FILE);
+
+        if (project == null || project.isDisposed()) {
+            return;
+        }
+
+        if(!validateGitLabApi(project)) {
+            return;
+        }
+
+        apiValidAction(anActionEvent);
+    }
+
+    public abstract void apiValidAction(AnActionEvent anActionEvent);
 
     /**
      * Validate git lab api settings
