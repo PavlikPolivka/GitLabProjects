@@ -50,8 +50,7 @@ public class CreateMergeRequestDialog extends DialogWrapper {
     protected void init() {
         super.init();
         setTitle("Create Merge Request");
-        setSize(600, 400);
-        setAutoAdjustable(false);
+        setHorizontalStretch(1.5f);
 
         currentBranch.setText(mergeRequestWorker.getGitLocalBranch().getName());
 

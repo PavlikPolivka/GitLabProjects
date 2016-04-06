@@ -65,8 +65,9 @@ public class GitLabCheckoutDialog extends DialogWrapper {
     protected void init() {
         super.init();
         setTitle("GitLab Checkout");
-        setSize(500, 600);
-        setAutoAdjustable(false);
+      setHorizontalStretch(2);
+//        setSize(500, 600);
+//        setAutoAdjustable(false);
         setOKButtonText("Checkout");
 
         Border emptyBorder = BorderFactory.createCompoundBorder();

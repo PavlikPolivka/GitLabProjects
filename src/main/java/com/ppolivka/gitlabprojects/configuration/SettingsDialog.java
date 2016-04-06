@@ -29,8 +29,6 @@ public class SettingsDialog extends DialogWrapper {
     protected void init() {
         super.init();
         setTitle(DIALOG_TITLE);
-        setSize(600, 300);
-        setAutoAdjustable(false);
         settingsView.setup();
     }
 
