@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.ppolivka.gitlabprojects</id>
     <name>GitLab Projects</name>
-    <version>1.3.0</version>
+    <version>1.3.1</version>
     <vendor email="polivka.pavel@gmail.com" url="http://ppolivka.com">Pavel Polivka</vendor>
 
     <description><![CDATA[
@@ -16,6 +16,9 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <br><b>1.3.1</b></br>
+        Fix for hi-res monitors<br>
+
         <br><b>1.3.0</b></br>
         <b>Added support for listing and accepting merge requests</b><br>
         GitLab Menu group moved to Git section, this way its only visible if there is Git defined in a project.<br>
