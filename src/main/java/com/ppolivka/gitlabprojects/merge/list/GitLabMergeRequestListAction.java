@@ -6,7 +6,7 @@ import com.ppolivka.gitlabprojects.common.GitLabApiAction;
 import git4idea.DialogManager;
 
 /**
- * TODO:Descibe
+ * Action for accepting merge request
  *
  * @author ppolivka
  * @since 31.10.2015

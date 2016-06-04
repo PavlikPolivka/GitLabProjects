@@ -8,8 +8,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableModel;
 import java.util.List;
 
@@ -51,11 +49,7 @@ public class GitLabMergeRequestListDialog extends DialogWrapper {
         listOfRequests.getColumnModel().getColumn(4).setMaxWidth(0);
         listOfRequests.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        listOfRequests.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
-            public void valueChanged(ListSelectionEvent event) {
-                setOKActionEnabled(true);
-            }
-        });
+        listOfRequests.getSelectionModel().addListSelectionListener(event -> setOKActionEnabled(true));
     }
 
     @Override

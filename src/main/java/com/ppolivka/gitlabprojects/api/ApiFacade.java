@@ -47,8 +47,17 @@ public class ApiFacade {
     public List<NamespaceDto> getNamespaces() throws IOException {
         return api.retrieve().getAll("/namespaces", NamespaceDto[].class);
     }
+
     public List<GitlabMergeRequest> getMergeRequests(GitlabProject project) throws IOException {
         return api.getOpenMergeRequests(project);
+    }
+
+    public List<GitlabNote> getMergeRequestComments(GitlabMergeRequest mergeRequest) throws IOException {
+      return api.getNotes(mergeRequest);
+    }
+
+    public void addComment(GitlabMergeRequest mergeRequest, String body) throws IOException {
+      api.createNote(mergeRequest, body);
     }
 
     public GitlabMergeRequest createMergeRequest(GitlabProject project, String from, String to, String title, String description) throws IOException {
