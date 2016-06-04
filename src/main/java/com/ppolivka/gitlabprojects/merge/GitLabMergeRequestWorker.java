@@ -107,16 +107,15 @@ public interface GitLabMergeRequestWorker {
                             }
                         }
                     } catch (Throwable throwable) {
-                        new Notifications.Bus().notify();
                         showErrorDialog(project, "Cannot find this project in GitLab Remote", CANNOT_CREATE_MERGE_REQUEST);
-                        throw new MergeRequestException();
+                        throw new MergeRequestException(throwable);
                     }
                 }
                 try {
                     mergeRequestWorker.setGitlabProject(settingsState.api().getProject(projectId));
                 } catch (Exception e) {
                     showErrorDialog(project, "Cannot find this project in GitLab Remote", CANNOT_CREATE_MERGE_REQUEST);
-                    throw new MergeRequestException();
+                    throw new MergeRequestException(e);
                 }
 
             mergeRequestWorker.setDiffViewWorker(new GitLabDiffViewWorker(project, mergeRequestWorker.getGitRepository()));
