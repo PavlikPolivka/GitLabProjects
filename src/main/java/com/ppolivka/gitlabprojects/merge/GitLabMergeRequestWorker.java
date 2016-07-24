@@ -1,14 +1,13 @@
 package com.ppolivka.gitlabprojects.merge;
 
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.ppolivka.gitlabprojects.util.GitLabUtil;
 import com.ppolivka.gitlabprojects.configuration.ProjectState;
 import com.ppolivka.gitlabprojects.configuration.SettingsState;
 import com.ppolivka.gitlabprojects.exception.MergeRequestException;
+import com.ppolivka.gitlabprojects.util.GitLabUtil;
 import git4idea.commands.Git;
 import git4idea.repo.GitRemote;
 import git4idea.repo.GitRepository;
@@ -28,98 +27,98 @@ import static com.ppolivka.gitlabprojects.util.MessageUtil.showErrorDialog;
  */
 public interface GitLabMergeRequestWorker {
 
-    String CANNOT_CREATE_MERGE_REQUEST = "Cannot Create Merge Request";
+  String CANNOT_CREATE_MERGE_REQUEST = "Cannot Create Merge Request";
 
-    Git getGit();
+  Git getGit();
 
-    Project getProject();
+  Project getProject();
 
-    ProjectState getProjectState();
+  ProjectState getProjectState();
 
-    GitRepository getGitRepository();
+  GitRepository getGitRepository();
 
-    String getRemoteUrl();
+  String getRemoteUrl();
 
-    GitlabProject getGitlabProject();
+  GitlabProject getGitlabProject();
 
-    String getRemoteProjectName();
+  String getRemoteProjectName();
 
-    GitLabDiffViewWorker getDiffViewWorker();
+  GitLabDiffViewWorker getDiffViewWorker();
 
-    void setGit(Git git);
+  void setGit(Git git);
 
-    void setProject(Project project);
+  void setProject(Project project);
 
-    void setProjectState(ProjectState projectState);
+  void setProjectState(ProjectState projectState);
 
-    void setGitRepository(GitRepository gitRepository);
+  void setGitRepository(GitRepository gitRepository);
 
-    void setRemoteUrl(String remoteUrl);
+  void setRemoteUrl(String remoteUrl);
 
-    void setGitlabProject(GitlabProject gitlabProject);
+  void setGitlabProject(GitlabProject gitlabProject);
 
-    void setRemoteProjectName(String remoteProjectName);
+  void setRemoteProjectName(String remoteProjectName);
 
-    void setDiffViewWorker(GitLabDiffViewWorker diffViewWorker);
+  void setDiffViewWorker(GitLabDiffViewWorker diffViewWorker);
 
-    class Util {
+  class Util {
 
-        private static SettingsState settingsState = SettingsState.getInstance();
+    private static SettingsState settingsState = SettingsState.getInstance();
 
-        public static void fillRequiredInfo(@NotNull final GitLabMergeRequestWorker mergeRequestWorker, @NotNull final Project project, @Nullable final VirtualFile file) throws MergeRequestException {
-            ProjectState projectState = ProjectState.getInstance(project);
-            mergeRequestWorker.setProjectState(projectState);
+    public static void fillRequiredInfo(@NotNull final GitLabMergeRequestWorker mergeRequestWorker, @NotNull final Project project, @Nullable final VirtualFile file) throws MergeRequestException {
+      ProjectState projectState = ProjectState.getInstance(project);
+      mergeRequestWorker.setProjectState(projectState);
 
-            mergeRequestWorker.setProject(project);
+      mergeRequestWorker.setProject(project);
 
-            Git git = ServiceManager.getService(Git.class);
-            mergeRequestWorker.setGit(git);
+      Git git = ServiceManager.getService(Git.class);
+      mergeRequestWorker.setGit(git);
 
-            GitRepository gitRepository = GitLabUtil.getGitRepository(project, file);
-            if (gitRepository == null) {
-                showErrorDialog(project, "Can't find git repository", CANNOT_CREATE_MERGE_REQUEST);
-                throw new MergeRequestException();
+      GitRepository gitRepository = GitLabUtil.getGitRepository(project, file);
+      if (gitRepository == null) {
+        showErrorDialog(project, "Can't find git repository", CANNOT_CREATE_MERGE_REQUEST);
+        throw new MergeRequestException();
+      }
+      gitRepository.update();
+      mergeRequestWorker.setGitRepository(gitRepository);
+
+      Pair<GitRemote, String> remote = GitLabUtil.findGitLabRemote(gitRepository);
+      if (remote == null) {
+        showErrorDialog(project, "Can't find GitLab remote", CANNOT_CREATE_MERGE_REQUEST);
+        throw new MergeRequestException();
+      }
+
+      String remoteProjectName = remote.first.getName();
+      mergeRequestWorker.setRemoteProjectName(remoteProjectName);
+      mergeRequestWorker.setRemoteUrl(remote.getSecond());
+
+      String remoteUrl = remote.getFirst().getFirstUrl();
+
+      Integer projectId = projectState.getProjectId();
+      if (projectId == null) {
+        try {
+          Collection<GitlabProject> projects = settingsState.api().getProjects();
+          for (GitlabProject gitlabProject : projects) {
+            if (gitlabProject.getName().equals(remoteProjectName) || gitlabProject.getSshUrl().equals(remoteUrl) || gitlabProject.getHttpUrl().equals(remoteUrl)) {
+              projectId = gitlabProject.getId();
+              projectState.setProjectId(projectId);
+              break;
             }
-            gitRepository.update();
-            mergeRequestWorker.setGitRepository(gitRepository);
-
-            Pair<GitRemote, String> remote = GitLabUtil.findGitLabRemote(gitRepository);
-            if (remote == null) {
-                showErrorDialog(project, "Can't find GitHub remote", CANNOT_CREATE_MERGE_REQUEST);
-                throw new MergeRequestException();
-            }
-
-            String remoteProjectName = remote.first.getName();
-            mergeRequestWorker.setRemoteProjectName(remoteProjectName);
-            mergeRequestWorker.setRemoteUrl(remote.getSecond());
-
-                String remoteUrl = remote.getFirst().getFirstUrl();
-
-                Integer projectId = projectState.getProjectId();
-                if (projectId == null) {
-                    try {
-                        Collection<GitlabProject> projects = settingsState.api().getProjects();
-                        for (GitlabProject gitlabProject : projects) {
-                            if (gitlabProject.getName().equals(remoteProjectName) || gitlabProject.getSshUrl().equals(remoteUrl) || gitlabProject.getHttpUrl().equals(remoteUrl)) {
-                                projectId = gitlabProject.getId();
-                                projectState.setProjectId(projectId);
-                                break;
-                            }
-                        }
-                    } catch (Throwable throwable) {
-                        showErrorDialog(project, "Cannot find this project in GitLab Remote", CANNOT_CREATE_MERGE_REQUEST);
-                        throw new MergeRequestException(throwable);
-                    }
-                }
-                try {
-                    mergeRequestWorker.setGitlabProject(settingsState.api().getProject(projectId));
-                } catch (Exception e) {
-                    showErrorDialog(project, "Cannot find this project in GitLab Remote", CANNOT_CREATE_MERGE_REQUEST);
-                    throw new MergeRequestException(e);
-                }
-
-            mergeRequestWorker.setDiffViewWorker(new GitLabDiffViewWorker(project, mergeRequestWorker.getGitRepository()));
+          }
+        } catch (Throwable throwable) {
+          showErrorDialog(project, "Cannot find this project in GitLab Remote", CANNOT_CREATE_MERGE_REQUEST);
+          throw new MergeRequestException(throwable);
         }
+      }
+      try {
+        mergeRequestWorker.setGitlabProject(settingsState.api().getProject(projectId));
+      } catch (Exception e) {
+        showErrorDialog(project, "Cannot find this project in GitLab Remote", CANNOT_CREATE_MERGE_REQUEST);
+        throw new MergeRequestException(e);
+      }
+
+      mergeRequestWorker.setDiffViewWorker(new GitLabDiffViewWorker(project, mergeRequestWorker.getGitRepository()));
     }
+  }
 
 }

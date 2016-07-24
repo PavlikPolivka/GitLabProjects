@@ -26,11 +26,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static com.ppolivka.gitlabprojects.util.MessageUtil.showErrorDialog;
 
@@ -75,28 +74,26 @@ public class GitLabUtil {
 
     @Nullable
     public static Pair<GitRemote, String> findGitLabRemote(@NotNull GitRepository repository) {
-        Pair<GitRemote, String> gitlabRemote = null;
         for (GitRemote gitRemote : repository.getRemotes()) {
             for (String remoteUrl : gitRemote.getUrls()) {
                 if (isGitLabUrl(remoteUrl)) {
-                    final String remoteName = gitRemote.getName();
-                    if ("gitlab".equals(remoteName) || "origin".equals(remoteName)) {
-                        return Pair.create(gitRemote, remoteUrl);
-                    }
-                    if (gitlabRemote == null) {
-                        gitlabRemote = Pair.create(gitRemote, remoteUrl);
-                    }
-                    break;
+                  return Pair.create(gitRemote, gitRemote.getName());
                 }
             }
         }
-        return gitlabRemote;
+        return null;
     }
 
     public static boolean isGitLabUrl(String url) {
-        Pattern urlPattern = Pattern.compile("^(https?)://([-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])");
-        Matcher matcher = urlPattern.matcher(settingsState.getHost());
-        return (matcher.matches() && removeNotAlpha(url).contains(removeNotAlpha(matcher.group(2))));
+      try {
+        URI fromSettings = new URI(settingsState.getHost());
+        String fromSettingsHost = fromSettings.getHost();
+        URI fromUrl = new URI(url);
+        String fromUrlHost = fromUrl.getHost();
+        return fromSettingsHost != null && fromUrlHost != null && removeNotAlpha(fromSettingsHost).equals(removeNotAlpha(fromUrlHost));
+      } catch (Exception e) {
+        return false;
+      }
     }
 
     public static String removeNotAlpha(String input) {

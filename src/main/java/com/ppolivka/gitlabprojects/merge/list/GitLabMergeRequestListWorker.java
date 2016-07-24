@@ -73,7 +73,7 @@ public class GitLabMergeRequestListWorker implements GitLabMergeRequestWorker {
                 try {
                     fillRequiredInfo(mergeRequestListWorker, project, file);
                 } catch (MergeRequestException e) {
-                    return null;
+                  return null;
                 }
 
                 try {
