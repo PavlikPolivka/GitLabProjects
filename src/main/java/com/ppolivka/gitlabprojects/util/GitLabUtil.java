@@ -22,6 +22,7 @@ import git4idea.config.GitVersion;
 import git4idea.repo.GitRemote;
 import git4idea.repo.GitRepository;
 import git4idea.repo.GitRepositoryManager;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,6 +31,8 @@ import java.net.URI;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.ppolivka.gitlabprojects.util.MessageUtil.showErrorDialog;
 
@@ -88,9 +91,21 @@ public class GitLabUtil {
       try {
         URI fromSettings = new URI(settingsState.getHost());
         String fromSettingsHost = fromSettings.getHost();
-        URI fromUrl = new URI(url);
-        String fromUrlHost = fromUrl.getHost();
-        return fromSettingsHost != null && fromUrlHost != null && removeNotAlpha(fromSettingsHost).equals(removeNotAlpha(fromUrlHost));
+
+        String patternString = "(\\w+://)(.+@)*([\\w\\d\\.]+)(:[\\d]+){0,1}/*(.*)|(.+@)*([\\w\\d\\.]+):(.*)";
+        Pattern pattern = Pattern.compile(patternString);
+        Matcher matcher = pattern.matcher(url);
+        String fromUrlHost = "";
+        if(matcher.matches()) {
+          String group3 = matcher.group(3);
+          String group7 = matcher.group(7);
+          if(StringUtils.isNotEmpty(group3)) {
+            fromUrlHost = group3;
+          } else if (StringUtils.isNotEmpty(group7)) {
+            fromUrlHost = group7;
+          }
+        }
+        return fromSettingsHost != null && removeNotAlpha(fromSettingsHost).equals(removeNotAlpha(fromUrlHost));
       } catch (Exception e) {
         return false;
       }
