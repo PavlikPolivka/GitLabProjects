@@ -17,6 +17,9 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <br><b>1.3.4</b><br>
+        Fix for merge request listing and creation<br>
+
         <br><b>1.3.3</b><br>
         Fix for cannot find remote error<br>
 
