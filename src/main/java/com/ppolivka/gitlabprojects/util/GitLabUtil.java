@@ -92,7 +92,7 @@ public class GitLabUtil {
         URI fromSettings = new URI(settingsState.getHost());
         String fromSettingsHost = fromSettings.getHost();
 
-        String patternString = "(\\w+://)(.+@)*([\\w\\d\\.]+)(:[\\d]+){0,1}/*(.*)|(.+@)*([\\w\\d\\.]+):(.*)";
+        String patternString = "(\\w+://)(.+@)*([\\w\\d\\.\\-]+)(:[\\d]+){0,1}/*(.*)|(.+@)*([\\w\\d\\.\\-]+):(.*)";
         Pattern pattern = Pattern.compile(patternString);
         Matcher matcher = pattern.matcher(url);
         String fromUrlHost = "";
@@ -112,7 +112,7 @@ public class GitLabUtil {
     }
 
     public static String removeNotAlpha(String input) {
-        input = input.replaceAll("[^a-zA-Z]", "");
+        input = input.replaceAll("[^a-zA-Z0-9]", "");
         input = input.toLowerCase();
         return input;
     }
