@@ -125,4 +125,9 @@ public class ApiFacade {
 
         return result;
     }
+
+    public Collection<GitlabUser> searchUsers(String text) throws IOException {
+      checkApi();
+      return api.retrieve().getAll(GitlabUser.URL+"?search="+text+"&page=1&per_page=5", GitlabUser[].class);
+    }
 }

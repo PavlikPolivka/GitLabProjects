@@ -27,6 +27,7 @@ public class CreateMergeRequestDialog extends DialogWrapper {
   private JTextField mergeTitle;
   private JTextArea mergeDescription;
   private JButton diffButton;
+  private UserAutocompleteComboBox assigneeBox;
 
   private SortedComboBoxModel<BranchInfo> myBranchModel;
   private BranchInfo lastSelectedBranch;
@@ -40,6 +41,7 @@ public class CreateMergeRequestDialog extends DialogWrapper {
     super(project);
     projectState = ProjectState.getInstance(project);
     mergeRequestWorker = gitLabMergeRequestWorker;
+    assigneeBox.setSearchable(new SearchableUsers(project));
     init();
   }
 
