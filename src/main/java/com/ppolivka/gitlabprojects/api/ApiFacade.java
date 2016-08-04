@@ -1,7 +1,9 @@
 package com.ppolivka.gitlabprojects.api;
 
 import com.ppolivka.gitlabprojects.api.dto.NamespaceDto;
+import org.gitlab.api.AuthMethod;
 import org.gitlab.api.GitlabAPI;
+import org.gitlab.api.TokenType;
 import org.gitlab.api.http.GitlabHTTPRequestor;
 import org.gitlab.api.models.*;
 
@@ -27,7 +29,7 @@ public class ApiFacade {
 
     public boolean reload(String host, String key) {
         if (host != null && key != null && !host.isEmpty() && !key.isEmpty()) {
-            api = GitlabAPI.connect(host, key);
+            api = GitlabAPI.connect(host, key, TokenType.PRIVATE_TOKEN, AuthMethod.URL_PARAMETER);
             api.ignoreCertificateErrors(true);
             return true;
         }
@@ -129,5 +131,6 @@ public class ApiFacade {
     public Collection<GitlabUser> searchUsers(String text) throws IOException {
       checkApi();
       return api.retrieve().getAll(GitlabUser.URL+"?search="+text+"&page=1&per_page=5", GitlabUser[].class);
+//      return api.getUsers();
     }
 }
