@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.ppolivka.gitlabprojects</id>
     <name>GitLab Projects</name>
-    <version>1.3.6</version>
+    <version>1.4.0</version>
     <vendor email="polivka.pavel@gmail.com" url="http://ppolivka.com">Pavel Polivka</vendor>
 
     <description><![CDATA[
@@ -12,10 +12,14 @@
             <li><b>GitLab Checkout dialog</b> - list all users projects on GitLab and provides quick way to clone them locally</li>
             <li><b>GitLab Share dialog</b> - allows quick import of new projects to GitLab, user can specify namespace and project visibility</li>
             <li><b>GitLab Merge Request dialog</b> - user can quickly create new merge requests from current branch</li>
+            <li><b>GitLab Merge Request List dialog</b> - user can list and accept all open code reviews</li>
         </ul>
     ]]></description>
 
     <change-notes><![CDATA[
+        <br><b>1.4.0</b><br>
+        <b>Selection of assignee when creating merge request</b><br>
+
         <br><b>1.3.6</b><br>
         Fix for repo url recognition<br>
 
@@ -37,7 +41,7 @@
         Fix for hi-res monitors<br>
 
         <br><b>1.3.0</b></br>
-        <b>Added support for listing and accepting merge requests</b><br>
+        Added support for listing and accepting merge requests<br>
         GitLab Menu group moved to Git section, this way its only visible if there is Git defined in a project.<br>
         Unified checks for GitLab API Settings,now runs in background Modal dialog<br>
 

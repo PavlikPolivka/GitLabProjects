@@ -24,6 +24,7 @@ import git4idea.repo.GitRepository;
 import org.gitlab.api.models.GitlabBranch;
 import org.gitlab.api.models.GitlabMergeRequest;
 import org.gitlab.api.models.GitlabProject;
+import org.gitlab.api.models.GitlabUser;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -61,7 +62,7 @@ public class GitLabCreateMergeRequestWorker implements GitLabMergeRequestWorker 
     private List<BranchInfo> branches;
     private BranchInfo lastUsedBranch;
 
-    public void createMergeRequest(final BranchInfo branch, final String title, final String description) {
+    public void createMergeRequest(final BranchInfo branch, final GitlabUser assignee, final String title, final String description) {
         new Task.Backgroundable(project, "Creating merge request...") {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
@@ -76,7 +77,7 @@ public class GitLabCreateMergeRequestWorker implements GitLabMergeRequestWorker 
                 indicator.setText("Creating merge request...");
                 GitlabMergeRequest mergeRequest;
                 try {
-                    mergeRequest = settingsState.api().createMergeRequest(gitlabProject, gitLocalBranch.getName(), branch.getName(), title, description);
+                    mergeRequest = settingsState.api().createMergeRequest(gitlabProject, assignee, gitLocalBranch.getName(), branch.getName(), title, description);
                 } catch (IOException e) {
                     showErrorDialog(project, "Cannot create Merge Request vis GitLab REST API", CANNOT_CREATE_MERGE_REQUEST);
                     return;
@@ -186,7 +187,7 @@ public class GitLabCreateMergeRequestWorker implements GitLabMergeRequestWorker 
                     return null;
                 }
 
-                mergeRequestWorker.setLocalBranchInfo(new BranchInfo(mergeRequestWorker.getGitLocalBranch().getName(),mergeRequestWorker.getRemoteProjectName(), false));
+                mergeRequestWorker.setLocalBranchInfo(new BranchInfo(mergeRequestWorker.getGitLocalBranch().getName(), mergeRequestWorker.getRemoteProjectName(), false));
                 //endregion
 
                 return mergeRequestWorker;
