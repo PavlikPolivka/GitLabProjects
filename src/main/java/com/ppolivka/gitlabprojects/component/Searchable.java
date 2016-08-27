@@ -3,13 +3,18 @@ package com.ppolivka.gitlabprojects.component;
 import java.util.Collection;
 
 /**
- * TODO:Describe
+ * Interface for searching actions
  *
  * @author ppolivka
- * @since $_version_$
+ * @since 1.4.0
  */
 public interface Searchable<R, T> {
 
+  /**
+   * Returns collections of R objects based on T
+   * @param toSearch
+   * @return
+   */
   Collection<R> search(T toSearch);
 
 }

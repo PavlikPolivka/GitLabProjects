@@ -5,9 +5,11 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.SortedComboBoxModel;
+import com.ppolivka.gitlabprojects.component.SearchBoxModel;
 import com.ppolivka.gitlabprojects.configuration.ProjectState;
 import com.ppolivka.gitlabprojects.merge.info.BranchInfo;
 import org.apache.commons.lang.StringUtils;
+import org.gitlab.api.models.GitlabUser;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,98 +23,119 @@ import javax.swing.*;
  */
 public class CreateMergeRequestDialog extends DialogWrapper {
 
-  private JPanel mainView;
-  private JComboBox targetBranch;
-  private JLabel currentBranch;
-  private JTextField mergeTitle;
-  private JTextArea mergeDescription;
-  private JButton diffButton;
-  private UserAutocompleteComboBox assigneeBox;
+    private Project project;
 
-  private SortedComboBoxModel<BranchInfo> myBranchModel;
-  private BranchInfo lastSelectedBranch;
+    private JPanel mainView;
+    private JComboBox targetBranch;
+    private JLabel currentBranch;
+    private JTextField mergeTitle;
+    private JTextArea mergeDescription;
+    private JButton diffButton;
+    private JComboBox assigneeBox;
 
-  final ProjectState projectState;
+    private SortedComboBoxModel<BranchInfo> myBranchModel;
+    private BranchInfo lastSelectedBranch;
 
-  @NotNull
-  final GitLabCreateMergeRequestWorker mergeRequestWorker;
+    final ProjectState projectState;
 
-  public CreateMergeRequestDialog(@Nullable Project project, @NotNull GitLabCreateMergeRequestWorker gitLabMergeRequestWorker) {
-    super(project);
-    projectState = ProjectState.getInstance(project);
-    mergeRequestWorker = gitLabMergeRequestWorker;
-    assigneeBox.setSearchable(new SearchableUsers(project));
-    init();
-  }
+    private SearchableUsers searchableUsers;
 
-  @Override
-  protected void init() {
-    super.init();
-    setTitle("Create Merge Request");
-    setHorizontalStretch(1.5f);
-    setVerticalStretch(2f);
+    @NotNull
+    final GitLabCreateMergeRequestWorker mergeRequestWorker;
 
-    currentBranch.setText(mergeRequestWorker.getGitLocalBranch().getName());
+    public CreateMergeRequestDialog(@Nullable Project project, @NotNull GitLabCreateMergeRequestWorker gitLabMergeRequestWorker) {
+        super(project);
+        this.project = project;
+        projectState = ProjectState.getInstance(project);
+        mergeRequestWorker = gitLabMergeRequestWorker;
+        this.searchableUsers = new SearchableUsers(project);
+        init();
 
-    myBranchModel = new SortedComboBoxModel<>((o1, o2) -> StringUtil.naturalCompare(o1.getName(), o2.getName()));
-    myBranchModel.setAll(mergeRequestWorker.getBranches());
-    targetBranch.setModel( myBranchModel);
-    targetBranch.setSelectedIndex(0);
-    if (mergeRequestWorker.getLastUsedBranch() != null) {
-      targetBranch.setSelectedItem(mergeRequestWorker.getLastUsedBranch());
     }
-    lastSelectedBranch = getSelectedBranch();
 
-    targetBranch.addActionListener(e -> {
-      prepareTitle();
-      lastSelectedBranch = getSelectedBranch();
-      projectState.setLastMergedBranch(getSelectedBranch().getName());
-      mergeRequestWorker.getDiffViewWorker().launchLoadDiffInfo(mergeRequestWorker.getLocalBranchInfo(), getSelectedBranch());
-    });
+    @Override
+    protected void init() {
+        super.init();
+        setTitle("Create Merge Request");
+        setHorizontalStretch(1.5f);
+        setVerticalStretch(2f);
 
-    prepareTitle();
+        SearchBoxModel searchBoxModel = new SearchBoxModel(assigneeBox, searchableUsers);
+        assigneeBox.setModel(searchBoxModel);
+        assigneeBox.setEditable(true);
+        assigneeBox.addItemListener(searchBoxModel);
+        assigneeBox.setBounds(140, 170, 180, 20);
 
-    diffButton.addActionListener(e -> mergeRequestWorker.getDiffViewWorker().showDiffDialog(mergeRequestWorker.getLocalBranchInfo(), getSelectedBranch()));
-  }
+        currentBranch.setText(mergeRequestWorker.getGitLocalBranch().getName());
 
-  @Override
-  protected void doOKAction() {
-    BranchInfo branch = getSelectedBranch();
-    if (mergeRequestWorker.checkAction(branch)) {
-      mergeRequestWorker.createMergeRequest(branch, mergeTitle.getText(), mergeDescription.getText());
-      super.doOKAction();
+        myBranchModel = new SortedComboBoxModel<>((o1, o2) -> StringUtil.naturalCompare(o1.getName(), o2.getName()));
+        myBranchModel.setAll(mergeRequestWorker.getBranches());
+        targetBranch.setModel(myBranchModel);
+        targetBranch.setSelectedIndex(0);
+        if (mergeRequestWorker.getLastUsedBranch() != null) {
+            targetBranch.setSelectedItem(mergeRequestWorker.getLastUsedBranch());
+        }
+        lastSelectedBranch = getSelectedBranch();
+
+        targetBranch.addActionListener(e -> {
+            prepareTitle();
+            lastSelectedBranch = getSelectedBranch();
+            projectState.setLastMergedBranch(getSelectedBranch().getName());
+            mergeRequestWorker.getDiffViewWorker().launchLoadDiffInfo(mergeRequestWorker.getLocalBranchInfo(), getSelectedBranch());
+        });
+
+        prepareTitle();
+
+        diffButton.addActionListener(e -> mergeRequestWorker.getDiffViewWorker().showDiffDialog(mergeRequestWorker.getLocalBranchInfo(), getSelectedBranch()));
     }
-  }
 
-  @Nullable
-  @Override
-  protected ValidationInfo doValidate() {
-    if (StringUtils.isBlank(mergeTitle.getText())) {
-      return new ValidationInfo("Merge title cannot be empty", mergeTitle);
+    @Override
+    protected void doOKAction() {
+        BranchInfo branch = getSelectedBranch();
+        if (mergeRequestWorker.checkAction(branch)) {
+            mergeRequestWorker.createMergeRequest(branch, getAssignee(), mergeTitle.getText(), mergeDescription.getText());
+            super.doOKAction();
+        }
     }
-    if (getSelectedBranch().getName().equals(currentBranch.getText())) {
-      return new ValidationInfo("Target branch must be different from current branch.", targetBranch);
+
+    @Nullable
+    @Override
+    protected ValidationInfo doValidate() {
+        if (StringUtils.isBlank(mergeTitle.getText())) {
+            return new ValidationInfo("Merge title cannot be empty", mergeTitle);
+        }
+        if (getSelectedBranch().getName().equals(currentBranch.getText())) {
+            return new ValidationInfo("Target branch must be different from current branch.", targetBranch);
+        }
+        return null;
     }
-    return null;
-  }
 
-  private BranchInfo getSelectedBranch() {
-    return (BranchInfo) targetBranch.getSelectedItem();
-  }
-
-  private void prepareTitle() {
-    if (StringUtils.isBlank(mergeTitle.getText()) || mergeTitleGenerator(lastSelectedBranch).equals(mergeTitle.getText())) {
-      mergeTitle.setText(mergeTitleGenerator(getSelectedBranch()));
+    private BranchInfo getSelectedBranch() {
+        return (BranchInfo) targetBranch.getSelectedItem();
     }
-  }
 
-  private String mergeTitleGenerator(BranchInfo branchInfo) {
-    return "Merge of " + currentBranch.getText() + " to " + branchInfo;
-  }
+    @Nullable
+    private GitlabUser getAssignee() {
+        SearchableUser searchableUser = (SearchableUser) this.assigneeBox.getSelectedItem();
+        if(searchableUser != null) {
+            return searchableUser.getGitLabUser();
+        }
+        return null;
+    }
 
-  @Nullable
-  @Override
-  protected JComponent createCenterPanel() {
-    return mainView;
-  }
+    private void prepareTitle() {
+        if (StringUtils.isBlank(mergeTitle.getText()) || mergeTitleGenerator(lastSelectedBranch).equals(mergeTitle.getText())) {
+            mergeTitle.setText(mergeTitleGenerator(getSelectedBranch()));
+        }
+    }
+
+    private String mergeTitleGenerator(BranchInfo branchInfo) {
+        return "Merge of " + currentBranch.getText() + " to " + branchInfo;
+    }
+
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return mainView;
+    }
 }

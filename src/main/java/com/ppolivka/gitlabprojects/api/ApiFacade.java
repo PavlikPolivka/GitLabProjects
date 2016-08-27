@@ -62,13 +62,18 @@ public class ApiFacade {
       api.createNote(mergeRequest, body);
     }
 
-    public GitlabMergeRequest createMergeRequest(GitlabProject project, String from, String to, String title, String description) throws IOException {
+    public GitlabMergeRequest createMergeRequest(GitlabProject project, GitlabUser assignee, String from, String to, String title, String description) throws IOException {
         String tailUrl = "/projects/"+project.getId()+ "/merge_requests";
-        return api.dispatch()
+        GitlabHTTPRequestor requestor = api.dispatch()
                 .with("source_branch", from)
                 .with("target_branch", to)
                 .with("title", title)
-                .with("description", description).to(tailUrl, GitlabMergeRequest.class);}
+                .with("description", description);
+        if(assignee != null) {
+            requestor.with("assignee_id", assignee.getId());
+        }
+
+                return requestor.to(tailUrl, GitlabMergeRequest.class);}
 
     public void acceptMergeRequest(GitlabProject project, GitlabMergeRequest mergeRequest, boolean removeSourceBranch) throws IOException {
         String tailUrl = "/projects/"+project.getId()+ "/merge_request/"+mergeRequest.getId()+"/merge";
@@ -130,7 +135,7 @@ public class ApiFacade {
 
     public Collection<GitlabUser> searchUsers(String text) throws IOException {
       checkApi();
-      return api.retrieve().getAll(GitlabUser.URL+"?search="+text+"&page=1&per_page=5", GitlabUser[].class);
+      return api.findUsers(text);
 //      return api.getUsers();
     }
 }

@@ -3,10 +3,10 @@ package com.ppolivka.gitlabprojects.merge.request;
 import org.gitlab.api.models.GitlabUser;
 
 /**
- * TODO:Describe
+ * One user returned from Search, used by combo box model
  *
  * @author ppolivka
- * @since $_version_$
+ * @since 1.4.0
  */
 public class SearchableUser {
 
@@ -16,8 +16,12 @@ public class SearchableUser {
     this.user = user;
   }
 
+  public GitlabUser getGitLabUser() {
+    return user;
+  }
+
   @Override
   public String toString() {
-    return user.getName() + " (" + user.getEmail() + ")";
+    return user.getName();
   }
 }
