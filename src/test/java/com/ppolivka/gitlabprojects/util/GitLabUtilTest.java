@@ -36,6 +36,8 @@ public class GitLabUtilTest {
     testUrl("https://gitlab-1.com:8080/", "git@gitlab-2.com:8084:Polivka/130regression.git", false);
     testUrl("http://gitlab-1.com:8080/", "git@gitlab-1.com:8084:Polivka/130regression.git", true);
     testUrl("http://gitlab-1.com/", "git@gitlab-1.com:Polivka/130regression.git", true);
+    testUrl("http://192.168.1.10/", "git@192.168.1.10:Polivka/130regression.git", true);
+    testUrl("http://192.168.1.10/", "http://192.168.1.10/Polivka/130regression.git", true);
   }
 
   private void testUrl(String settings, String remote, boolean shouldBe) {
