@@ -55,28 +55,32 @@ public class ApiFacade {
     }
 
     public List<GitlabNote> getMergeRequestComments(GitlabMergeRequest mergeRequest) throws IOException {
-      return api.getNotes(mergeRequest);
+        return api.getNotes(mergeRequest);
     }
 
     public void addComment(GitlabMergeRequest mergeRequest, String body) throws IOException {
-      api.createNote(mergeRequest, body);
+        api.createNote(mergeRequest, body);
     }
 
-    public GitlabMergeRequest createMergeRequest(GitlabProject project, GitlabUser assignee, String from, String to, String title, String description) throws IOException {
-        String tailUrl = "/projects/"+project.getId()+ "/merge_requests";
+    public GitlabMergeRequest createMergeRequest(GitlabProject project, GitlabUser assignee, String from, String to, String title, String description, boolean removeSourceBranch) throws IOException {
+        String tailUrl = "/projects/" + project.getId() + "/merge_requests";
         GitlabHTTPRequestor requestor = api.dispatch()
                 .with("source_branch", from)
                 .with("target_branch", to)
                 .with("title", title)
                 .with("description", description);
-        if(assignee != null) {
+        if(removeSourceBranch) {
+            requestor.with("remove_source_branch", true);
+        }
+        if (assignee != null) {
             requestor.with("assignee_id", assignee.getId());
         }
 
-                return requestor.to(tailUrl, GitlabMergeRequest.class);}
+        return requestor.to(tailUrl, GitlabMergeRequest.class);
+    }
 
     public void acceptMergeRequest(GitlabProject project, GitlabMergeRequest mergeRequest, boolean removeSourceBranch) throws IOException {
-        String tailUrl = "/projects/"+project.getId()+ "/merge_request/"+mergeRequest.getId()+"/merge";
+        String tailUrl = "/projects/" + project.getId() + "/merge_request/" + mergeRequest.getId() + "/merge";
         GitlabHTTPRequestor requestor = api.retrieve().method("PUT");
         requestor.with("should_remove_source_branch", removeSourceBranch);
         requestor.to(tailUrl, mergeRequest);
@@ -134,8 +138,8 @@ public class ApiFacade {
     }
 
     public Collection<GitlabUser> searchUsers(String text) throws IOException {
-      checkApi();
-      return api.findUsers(text);
+        checkApi();
+        return api.findUsers(text);
 //      return api.getUsers();
     }
 }

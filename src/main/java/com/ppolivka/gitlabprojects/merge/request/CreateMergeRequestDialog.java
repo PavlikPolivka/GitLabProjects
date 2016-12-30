@@ -32,6 +32,7 @@ public class CreateMergeRequestDialog extends DialogWrapper {
     private JTextArea mergeDescription;
     private JButton diffButton;
     private JComboBox assigneeBox;
+    private JCheckBox removeSourceBranch;
 
     private SortedComboBoxModel<BranchInfo> myBranchModel;
     private BranchInfo lastSelectedBranch;
@@ -93,7 +94,7 @@ public class CreateMergeRequestDialog extends DialogWrapper {
     protected void doOKAction() {
         BranchInfo branch = getSelectedBranch();
         if (mergeRequestWorker.checkAction(branch)) {
-            mergeRequestWorker.createMergeRequest(branch, getAssignee(), mergeTitle.getText(), mergeDescription.getText());
+            mergeRequestWorker.createMergeRequest(branch, getAssignee(), mergeTitle.getText(), mergeDescription.getText(), removeSourceBranch.isSelected());
             super.doOKAction();
         }
     }

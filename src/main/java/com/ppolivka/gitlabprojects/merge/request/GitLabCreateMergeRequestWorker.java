@@ -62,7 +62,7 @@ public class GitLabCreateMergeRequestWorker implements GitLabMergeRequestWorker 
     private List<BranchInfo> branches;
     private BranchInfo lastUsedBranch;
 
-    public void createMergeRequest(final BranchInfo branch, final GitlabUser assignee, final String title, final String description) {
+    public void createMergeRequest(final BranchInfo branch, final GitlabUser assignee, final String title, final String description, final boolean removeSourceBranch) {
         new Task.Backgroundable(project, "Creating merge request...") {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
@@ -77,7 +77,7 @@ public class GitLabCreateMergeRequestWorker implements GitLabMergeRequestWorker 
                 indicator.setText("Creating merge request...");
                 GitlabMergeRequest mergeRequest;
                 try {
-                    mergeRequest = settingsState.api().createMergeRequest(gitlabProject, assignee, gitLocalBranch.getName(), branch.getName(), title, description);
+                    mergeRequest = settingsState.api().createMergeRequest(gitlabProject, assignee, gitLocalBranch.getName(), branch.getName(), title, description, removeSourceBranch);
                 } catch (IOException e) {
                     showErrorDialog(project, "Cannot create Merge Request vis GitLab REST API", CANNOT_CREATE_MERGE_REQUEST);
                     return;

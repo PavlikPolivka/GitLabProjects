@@ -18,6 +18,7 @@
 
     <change-notes><![CDATA[
         <br><b>1.4.1</b><br>
+        Added remove source branch checkbox to merge request creation<br>
         Less strict project resolving for merge request actions<br>
         Fix for ClassCastException when using creating merge request<br>
 
