@@ -103,7 +103,9 @@ public class SearchBoxModel extends AbstractListModel implements ComboBoxModel, 
 
     @Override
     public void setSelectedItem(Object anItem) {
-        this.selectedUser = (SearchableUser) anItem;
+        if(anItem instanceof SearchableUser) {
+            this.selectedUser = (SearchableUser) anItem;
+        }
     }
 
     @Override
