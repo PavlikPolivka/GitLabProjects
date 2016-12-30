@@ -18,21 +18,19 @@ public class GitLabProjectMatcher {
         String remoteProjectName = remote.getName();
         String remoteUrl = remote.getFirstUrl();
 
-        Integer projectId = projectState.getProjectId();
-        if (projectId == null) {
-            try {
-                Collection<GitlabProject> projects = settingsState.api().getProjects();
-                for (GitlabProject gitlabProject : projects) {
-                    if (gitlabProject.getName().equals(remoteProjectName) || urlMatch(remoteUrl, gitlabProject.getSshUrl()) || urlMatch(remoteUrl, gitlabProject.getHttpUrl())) {
-                        projectId = gitlabProject.getId();
-                        projectState.setProjectId(projectId);
-                        return Optional.of(gitlabProject);
-                    }
+        try {
+            Collection<GitlabProject> projects = settingsState.api().getProjects();
+            for (GitlabProject gitlabProject : projects) {
+                if (gitlabProject.getName().equals(remoteProjectName) || urlMatch(remoteUrl, gitlabProject.getSshUrl()) || urlMatch(remoteUrl, gitlabProject.getHttpUrl())) {
+                    Integer projectId = gitlabProject.getId();
+                    projectState.setProjectId(projectId);
+                    return Optional.of(gitlabProject);
                 }
-            } catch (Throwable throwable) {
-                throw new GitLabException("Cannot match project.", throwable);
             }
+        } catch (Throwable throwable) {
+            throw new GitLabException("Cannot match project.", throwable);
         }
+
         return Optional.empty();
     }
 
