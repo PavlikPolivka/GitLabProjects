@@ -7,6 +7,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.ppolivka.gitlabprojects.configuration.ProjectState;
 import com.ppolivka.gitlabprojects.configuration.SettingsState;
 import com.ppolivka.gitlabprojects.exception.MergeRequestException;
+import com.ppolivka.gitlabprojects.merge.helper.GitLabProjectMatcher;
 import com.ppolivka.gitlabprojects.util.GitLabUtil;
 import git4idea.commands.Git;
 import git4idea.repo.GitRemote;
@@ -15,7 +16,7 @@ import org.gitlab.api.models.GitlabProject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
+import java.util.Optional;
 
 import static com.ppolivka.gitlabprojects.util.MessageUtil.showErrorDialog;
 
@@ -64,6 +65,7 @@ public interface GitLabMergeRequestWorker {
   class Util {
 
     private static SettingsState settingsState = SettingsState.getInstance();
+    private static GitLabProjectMatcher projectMatcher = new GitLabProjectMatcher();
 
     public static void fillRequiredInfo(@NotNull final GitLabMergeRequestWorker mergeRequestWorker, @NotNull final Project project, @Nullable final VirtualFile file) throws MergeRequestException {
       ProjectState projectState = ProjectState.getInstance(project);
@@ -92,25 +94,9 @@ public interface GitLabMergeRequestWorker {
       mergeRequestWorker.setRemoteProjectName(remoteProjectName);
       mergeRequestWorker.setRemoteUrl(remote.getSecond());
 
-      String remoteUrl = remote.getFirst().getFirstUrl();
-
-      Integer projectId = projectState.getProjectId();
-      if (projectId == null) {
-        try {
-          Collection<GitlabProject> projects = settingsState.api().getProjects();
-          for (GitlabProject gitlabProject : projects) {
-            if (gitlabProject.getName().equals(remoteProjectName) || gitlabProject.getSshUrl().equals(remoteUrl) || gitlabProject.getHttpUrl().equals(remoteUrl)) {
-              projectId = gitlabProject.getId();
-              projectState.setProjectId(projectId);
-              break;
-            }
-          }
-        } catch (Throwable throwable) {
-          showErrorDialog(project, "Cannot find this project in GitLab Remote", CANNOT_CREATE_MERGE_REQUEST);
-          throw new MergeRequestException(throwable);
-        }
-      }
       try {
+        Optional<GitlabProject> gitlabProject = projectMatcher.resolveProject(projectState, remote.getFirst());
+        Integer projectId = gitlabProject.orElseThrow(() -> new RuntimeException("No project found")).getId();
         mergeRequestWorker.setGitlabProject(settingsState.api().getProject(projectId));
       } catch (Exception e) {
         showErrorDialog(project, "Cannot find this project in GitLab Remote", CANNOT_CREATE_MERGE_REQUEST);
