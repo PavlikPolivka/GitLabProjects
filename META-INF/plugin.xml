@@ -19,6 +19,7 @@
     <change-notes><![CDATA[
         <br><b>1.4.1</b><br>
         Less strict project resolving for merge request actions<br>
+        Fix for ClassCastException when using creating merge request<br>
 
         <br><b>1.4.0</b><br>
         <b>Selection of assignee when creating merge request</b><br>
