@@ -32,5 +32,6 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="git4idea" level="project" />
   </component>
 </module>

@@ -1,6 +1,7 @@
 package com.ppolivka.gitlabprojects.checkout;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
@@ -40,6 +41,8 @@ import static com.ppolivka.gitlabprojects.util.MessageUtil.showErrorDialog;
  */
 public class GitLabCheckoutDialog extends DialogWrapper {
 
+    private static final Logger LOG = Logger.getInstance("#com.ppolivka.gitlabprojects.checkout.GitLabCheckoutDialog");
+
     private JPanel mainView;
     private JButton refreshButton;
     private JButton settingsButton;
@@ -65,9 +68,7 @@ public class GitLabCheckoutDialog extends DialogWrapper {
     protected void init() {
         super.init();
         setTitle("GitLab Checkout");
-      setHorizontalStretch(2);
-//        setSize(500, 600);
-//        setAutoAdjustable(false);
+        setHorizontalStretch(2);
         setOKButtonText("Checkout");
 
         Border emptyBorder = BorderFactory.createCompoundBorder();
@@ -105,7 +106,7 @@ public class GitLabCheckoutDialog extends DialogWrapper {
         allProjects.setDragEnabled(false);
         MouseListener ml = new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
-                setOKActionEnabled(false);
+                okAction(false);
                 int selRow = allProjects.getRowForLocation(e.getX(), e.getY());
                 TreePath selPath = allProjects.getPathForLocation(e.getX(), e.getY());
                 if (selRow != -1) {
@@ -114,7 +115,7 @@ public class GitLabCheckoutDialog extends DialogWrapper {
                     String url = "";
                     if (selectedNode.getChildCount() == 0 && !allProjects.isRootVisible()) {
                         url = selectedNode.toString();
-                        setOKActionEnabled(true);
+                        okAction(true);
                         lastUsedUrl = url;
                         if (e.getClickCount() == 2) {
                             close(OK_EXIT_CODE);
@@ -134,6 +135,15 @@ public class GitLabCheckoutDialog extends DialogWrapper {
         Collection<ProjectDto> projectDtos = settingsState.getProjects();
         reDrawTree(projectDtos == null ? noProjects() : projectDtos);
 
+    }
+
+    private void okAction(boolean enabled) {
+        try {
+            setOKActionEnabled(enabled);
+        } catch (Throwable t) {
+            // do nothing
+            LOG.debug("Error changing status of OK action.", t);
+        }
     }
 
     public String getLastUsedUrl() {

@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="git4idea">
+    <CLASSES>
+      <root url="jar://$APPLICATION_HOME_DIR$/plugins/git4idea/lib/git4idea.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
