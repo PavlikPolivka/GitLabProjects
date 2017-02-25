@@ -67,6 +67,8 @@ public class GitLabCreateMergeRequestWorker implements GitLabMergeRequestWorker 
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
 
+                projectState.setDeleteMergedBranch(removeSourceBranch);
+
                 indicator.setText("Pushing current branch...");
                 GitCommandResult result = git.push(gitRepository, branch.getRemoteName(), remoteUrl, gitLocalBranch.getName(), true);
                 if (!result.success()) {

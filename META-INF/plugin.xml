@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.ppolivka.gitlabprojects</id>
     <name>GitLab Projects</name>
-    <version>1.4.2</version>
+    <version>1.4.3</version>
     <vendor email="polivka.pavel@gmail.com" url="http://ppolivka.com">Pavel Polivka</vendor>
 
     <description><![CDATA[
@@ -17,6 +17,9 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <br><b>1.4.3</b><br>
+        Remove source branch checkbox will stay in same stay for next merge request<br>
+
         <br><b>1.4.2</b><br>
         Fix for checkout error<br>
 

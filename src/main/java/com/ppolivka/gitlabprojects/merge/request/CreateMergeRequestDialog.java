@@ -87,6 +87,11 @@ public class CreateMergeRequestDialog extends DialogWrapper {
 
         prepareTitle();
 
+        Boolean deleteMergedBranch = projectState.getDeleteMergedBranch();
+        if(deleteMergedBranch != null && deleteMergedBranch) {
+            this.removeSourceBranch.setSelected(true);
+        }
+
         diffButton.addActionListener(e -> mergeRequestWorker.getDiffViewWorker().showDiffDialog(mergeRequestWorker.getLocalBranchInfo(), getSelectedBranch()));
     }
 
