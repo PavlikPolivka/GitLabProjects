@@ -24,6 +24,6 @@ Simple plugin that is adding support for GitLab specific actions to JetBrain IDE
 ### Contributing
 Everybody is welcome to contribute to this project.
 
-Submit your pull requests to **develop** branch.
+Submit your pull requests to **master** branch.
 
 Master is always exact code that is used in latest release.
