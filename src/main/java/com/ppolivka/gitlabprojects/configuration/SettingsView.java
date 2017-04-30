@@ -164,7 +164,7 @@ public class SettingsView implements SearchableConfigurable {
         if (!hostText.endsWith("/")) {
             helpUrl.append("/");
         }
-        helpUrl.append("profile/account");
+        helpUrl.append("profile/personal_access_tokens");
         return helpUrl.toString();
     }
 

@@ -17,6 +17,9 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <br><b>1.4.4</b><br>
+        Design changes to improve setting dialog for new users<br>
+
         <br><b>1.4.3</b><br>
         Remove source branch checkbox will stay in same stay for next merge request<br>
 
