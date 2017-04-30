@@ -29,7 +29,7 @@
           <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="GitLab Server Url"/>
+          <text value="GitLab Server Url (Example: https://gitlab.com/)"/>
         </properties>
       </component>
       <component id="4260" class="javax.swing.JLabel">
@@ -37,7 +37,7 @@
           <grid row="2" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="GitLab API Key"/>
+          <text value="GitLab Personal Access Token"/>
         </properties>
       </component>
       <component id="234e8" class="javax.swing.JButton" binding="apiHelpButton">
@@ -45,9 +45,9 @@
           <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <enabled value="true"/>
+          <enabled value="false"/>
           <hideActionText value="false"/>
-          <icon value="actions/help.png"/>
+          <icon value="general/web.png"/>
           <text value=""/>
           <toolTipText value="API Key can be find in your profile setting inside GitLab Server"/>
         </properties>
