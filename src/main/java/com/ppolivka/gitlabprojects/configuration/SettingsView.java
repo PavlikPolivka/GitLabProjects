@@ -3,7 +3,6 @@ package com.ppolivka.gitlabprojects.configuration;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.ui.ValidationInfo;
-import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,8 +13,6 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.net.UnknownHostException;
@@ -56,17 +53,6 @@ public class SettingsView implements SearchableConfigurable {
             @Override
             public void changedUpdate(DocumentEvent e) {
                 onServerChange();
-            }
-        });
-        textHost.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                super.keyReleased(e);
-                if(StringUtils.isNotBlank(textHost.getText())) {
-                    apiHelpButton.setEnabled(true);
-                } else {
-                    apiHelpButton.setEnabled(false);
-                }
             }
         });
         apiHelpButton.addActionListener(new ActionListener() {
