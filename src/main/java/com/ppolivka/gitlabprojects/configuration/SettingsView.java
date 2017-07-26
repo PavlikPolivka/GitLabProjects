@@ -16,6 +16,10 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URI;
 import java.net.UnknownHostException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,6 +35,7 @@ public class SettingsView implements SearchableConfigurable {
 
     public static final String DIALOG_TITLE = "GitLab Settings";
     SettingsState settingsState = SettingsState.getInstance();
+    ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private JPanel mainPanel;
     private JTextField textHost;
@@ -64,7 +69,7 @@ public class SettingsView implements SearchableConfigurable {
     }
 
     @Nullable
-    public ValidationInfo doValidate() {
+    public ValidationInfo doValidate(long timeout) {
         final String hostText = textHost.getText();
         final String apiText = textAPI.getText();
         try {
@@ -72,12 +77,22 @@ public class SettingsView implements SearchableConfigurable {
                 if (!isValidUrl(hostText)) {
                     return new ValidationInfo(SettingError.NOT_A_URL.message(), textHost);
                 } else {
+
+                    Future<ValidationInfo> infoFuture = executor.submit(() -> {
+                        try {
+                            settingsState.isApiValid(hostText, apiText);
+                            return null;
+                        } catch (UnknownHostException e) {
+                            return new ValidationInfo(SettingError.SERVER_CANNOT_BE_REACHED.message(), textHost);
+                        } catch (IOException e) {
+                            return new ValidationInfo(SettingError.INVALID_API_TOKEN.message(), textAPI);
+                        }
+                    });
                     try {
-                        settingsState.isApiValid(hostText, apiText);
-                    } catch (UnknownHostException e) {
-                        return new ValidationInfo(SettingError.SERVER_CANNOT_BE_REACHED.message(), textHost);
-                    } catch (IOException e) {
-                        return new ValidationInfo(SettingError.INVALID_API_TOKEN.message(), textAPI);
+                        ValidationInfo info = infoFuture.get(timeout, TimeUnit.MILLISECONDS);
+                        return info;
+                    } catch (Exception e) {
+                        return new ValidationInfo(SettingError.GENERAL_ERROR.message());
                     }
                 }
             }
@@ -169,7 +184,7 @@ public class SettingsView implements SearchableConfigurable {
     }
 
     private void onServerChange() {
-        ValidationInfo validationInfo = doValidate();
+        ValidationInfo validationInfo = doValidate(500);
         if (validationInfo == null || (validationInfo != null && !validationInfo.message.equals(SettingError.NOT_A_URL.message))) {
             apiHelpButton.setEnabled(true);
             apiHelpButton.setToolTipText("API Key can be find in your profile setting inside GitLab Server: \n" + generateHelpUrl());
