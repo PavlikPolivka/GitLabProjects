@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.ppolivka.gitlabprojects</id>
     <name>GitLab Projects</name>
-    <version>1.4.5</version>
+    <version>1.4.6</version>
     <vendor email="polivka.pavel@gmail.com" url="http://ppolivka.com">Pavel Polivka</vendor>
 
     <description><![CDATA[
@@ -17,6 +17,9 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <br><b>1.4.6</b><br>
+        Admin will see just "their" projects, if you want to see something add your self to the project. This is done to speed the project listing up.<br>
+
         <br><b>1.4.5</b><br>
         Multiple remotes in one IDE project fix.<br>
         Slow settings url validation fix.<br>
