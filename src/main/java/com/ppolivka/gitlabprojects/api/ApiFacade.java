@@ -128,9 +128,9 @@ public class ApiFacade {
 
         List<GitlabProject> projects;
         try {
-            projects = api.getAllProjects();
-        } catch (Throwable e) {
             projects = api.getProjects();
+        } catch (Throwable e) {
+            projects = Collections.emptyList();
         }
         result.addAll(projects);
 
