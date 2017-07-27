@@ -8,6 +8,7 @@ import org.gitlab.api.http.GitlabHTTPRequestor;
 import org.gitlab.api.models.*;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -137,9 +138,14 @@ public class ApiFacade {
         return result;
     }
 
-    public Collection<GitlabUser> searchUsers(String text) throws IOException {
+    public Collection<GitlabUser> searchUsers(GitlabProject project, String text) throws IOException {
         checkApi();
-        return api.findUsers(text);
-//      return api.getUsers();
+        List<GitlabUser> users = new ArrayList<>();
+        if (text != null) {
+            String tailUrl = GitlabProject.URL + "/" + project.getId() + "/users" + "?search=" + URLEncoder.encode(text, "UTF-8");
+            GitlabUser[] response = api.retrieve().to(tailUrl, GitlabUser[].class);
+            users = Arrays.asList(response);
+        }
+        return users;
     }
 }

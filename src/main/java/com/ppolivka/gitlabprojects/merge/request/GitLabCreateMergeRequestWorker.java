@@ -61,6 +61,7 @@ public class GitLabCreateMergeRequestWorker implements GitLabMergeRequestWorker 
     private BranchInfo localBranchInfo;
     private List<BranchInfo> branches;
     private BranchInfo lastUsedBranch;
+    private SearchableUsers searchableUsers;
 
     public void createMergeRequest(final BranchInfo branch, final GitlabUser assignee, final String title, final String description, final boolean removeSourceBranch) {
         new Task.Backgroundable(project, "Creating merge request...") {
@@ -190,6 +191,7 @@ public class GitLabCreateMergeRequestWorker implements GitLabMergeRequestWorker 
                 }
 
                 mergeRequestWorker.setLocalBranchInfo(new BranchInfo(mergeRequestWorker.getGitLocalBranch().getName(), mergeRequestWorker.getRemoteProjectName(), false));
+                mergeRequestWorker.setSearchableUsers(new SearchableUsers(project, mergeRequestWorker.getGitlabProject()));
                 //endregion
 
                 return mergeRequestWorker;
@@ -311,6 +313,15 @@ public class GitLabCreateMergeRequestWorker implements GitLabMergeRequestWorker 
     public void setLastUsedBranch(BranchInfo lastUsedBranch) {
         this.lastUsedBranch = lastUsedBranch;
     }
+
+    public SearchableUsers getSearchableUsers() {
+        return searchableUsers;
+    }
+
+    public void setSearchableUsers(SearchableUsers searchableUsers) {
+        this.searchableUsers = searchableUsers;
+    }
+
     //endregion
 
 }

@@ -19,6 +19,7 @@
     <change-notes><![CDATA[
         <br><b>1.4.6</b><br>
         Admin will see just "their" projects, if you want to see something add your self to the project. This is done to speed the project listing up.<br>
+        Assignee box is now prepopulated by some project users (limited by paging), search will only search in projects users as well.<br>
 
         <br><b>1.4.5</b><br>
         Multiple remotes in one IDE project fix.<br>

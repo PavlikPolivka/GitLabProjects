@@ -39,8 +39,6 @@ public class CreateMergeRequestDialog extends DialogWrapper {
 
     final ProjectState projectState;
 
-    private SearchableUsers searchableUsers;
-
     @NotNull
     final GitLabCreateMergeRequestWorker mergeRequestWorker;
 
@@ -49,7 +47,6 @@ public class CreateMergeRequestDialog extends DialogWrapper {
         this.project = project;
         projectState = ProjectState.getInstance(project);
         mergeRequestWorker = gitLabMergeRequestWorker;
-        this.searchableUsers = new SearchableUsers(project);
         init();
 
     }
@@ -61,7 +58,7 @@ public class CreateMergeRequestDialog extends DialogWrapper {
         setHorizontalStretch(1.5f);
         setVerticalStretch(2f);
 
-        SearchBoxModel searchBoxModel = new SearchBoxModel(assigneeBox, searchableUsers);
+        SearchBoxModel searchBoxModel = new SearchBoxModel(assigneeBox, mergeRequestWorker.getSearchableUsers());
         assigneeBox.setModel(searchBoxModel);
         assigneeBox.setEditable(true);
         assigneeBox.addItemListener(searchBoxModel);

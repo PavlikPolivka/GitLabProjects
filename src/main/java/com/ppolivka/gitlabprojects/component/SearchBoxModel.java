@@ -29,11 +29,14 @@ public class SearchBoxModel extends AbstractListModel implements ComboBoxModel, 
     private volatile long lastKeyPressTime = 0L;
     private transient Timer timer;
 
+    private String lastQuery = "";
+
     public SearchBoxModel(JComboBox comboBox, SearchableUsers searchableUsers) {
         this.comboBox = comboBox;
         this.comboBoxEditor = comboBox.getEditor();
         this.comboBoxEditor.getEditorComponent().addKeyListener(this);
         this.searchableUsers = searchableUsers;
+        this.data.addAll(searchableUsers.getInitialModel());
         timer = new Timer();
     }
 
@@ -43,13 +46,20 @@ public class SearchBoxModel extends AbstractListModel implements ComboBoxModel, 
             public void run() {
                 SwingUtilities.invokeLater(() -> {
                     if((System.currentTimeMillis() - lastKeyPressTime) > 200) {
-                        data.clear();
-                        data = Arrays.asList(new EmptyUser(in), new EmptyUser("loading..."));
-                        dataChanged();
-                        data = new ArrayList<>();
-                        data.add(new EmptyUser(in));
-                        data.addAll(searchableUsers.search(in));
-                        dataChanged();
+                        if(in != null && !"".equals(in) && !in.equals(lastQuery)) {
+                            data.clear();
+                            data = Arrays.asList(new EmptyUser(in), new EmptyUser("loading..."));
+                            dataChanged();
+                            data = new ArrayList<>();
+                            data.add(new EmptyUser(in));
+                            data.addAll(searchableUsers.search(in));
+                            lastQuery = in;
+                            dataChanged();
+                        } else if (in == null || "".equals(in)){
+                            data.clear();
+                            data.addAll(searchableUsers.getInitialModel());
+                            dataChanged();
+                        }
                     }
                 });
             }

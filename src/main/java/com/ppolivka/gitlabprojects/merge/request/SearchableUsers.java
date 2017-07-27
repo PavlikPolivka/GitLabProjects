@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.ppolivka.gitlabprojects.component.Searchable;
 import com.ppolivka.gitlabprojects.configuration.SettingsState;
 import com.ppolivka.gitlabprojects.util.MessageUtil;
+import org.gitlab.api.models.GitlabProject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,16 +23,20 @@ import static java.util.Collections.emptyList;
 public class SearchableUsers implements Searchable<SearchableUser, String> {
 
     private Project project;
+    private GitlabProject gitlabProject;
+    private Collection<SearchableUser> initialModel;
     private static SettingsState settingsState = SettingsState.getInstance();
 
-    public SearchableUsers(Project project) {
+    public SearchableUsers(Project project, GitlabProject gitlabProject) {
         this.project = project;
+        this.gitlabProject = gitlabProject;
+        this.initialModel = search("");
     }
 
     @Override
     public Collection<SearchableUser> search(String toSearch) {
         try {
-            List<SearchableUser> users = settingsState.api().searchUsers(toSearch).stream().map(SearchableUser::new).collect(Collectors.toList());
+            List<SearchableUser> users = settingsState.api().searchUsers(gitlabProject, toSearch).stream().map(SearchableUser::new).collect(Collectors.toList());
             List<SearchableUser> resultingUsers = new ArrayList<>();
             resultingUsers.addAll(users);
             return resultingUsers;
@@ -41,4 +46,11 @@ public class SearchableUsers implements Searchable<SearchableUser, String> {
         return emptyList();
     }
 
+    public Collection<SearchableUser> getInitialModel() {
+        return initialModel;
+    }
+
+    public void setInitialModel(Collection<SearchableUser> initialModel) {
+        this.initialModel = initialModel;
+    }
 }
