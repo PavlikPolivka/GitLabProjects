@@ -21,7 +21,7 @@ public class GitLabProjectMatcher {
         try {
             Collection<GitlabProject> projects = settingsState.api().getProjects();
             for (GitlabProject gitlabProject : projects) {
-                if (gitlabProject.getName().equals(remoteProjectName) || urlMatch(remoteUrl, gitlabProject.getSshUrl()) || urlMatch(remoteUrl, gitlabProject.getHttpUrl())) {
+                if (gitlabProject.getName().toLowerCase().equals(remoteProjectName.toLowerCase()) || urlMatch(remoteUrl, gitlabProject.getSshUrl()) || urlMatch(remoteUrl, gitlabProject.getHttpUrl())) {
                     Integer projectId = gitlabProject.getId();
                     projectState.setProjectId(projectId);
                     return Optional.of(gitlabProject);
@@ -39,7 +39,7 @@ public class GitLabProjectMatcher {
         String formattedApiUrl = apiUrl.trim();
         formattedRemoteUrl = formattedRemoteUrl.replace("https://", "");
         formattedRemoteUrl = formattedRemoteUrl.replace("http://", "");
-        return StringUtils.isNotBlank(formattedApiUrl) && StringUtils.isNotBlank(formattedRemoteUrl) && formattedApiUrl.contains(formattedRemoteUrl);
+        return StringUtils.isNotBlank(formattedApiUrl) && StringUtils.isNotBlank(formattedRemoteUrl) && formattedApiUrl.toLowerCase().contains(formattedRemoteUrl.toLowerCase());
     }
 
 }

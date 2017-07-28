@@ -17,6 +17,9 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <br><b>1.4.7</b><br>
+        Fixes the bug when sometimes merge request dialogs did not work.<br>
+
         <br><b>1.4.6</b><br>
         Admin will see just "their" projects, if you want to see something add your self to the project. This is done to speed the project listing up.<br>
         Assignee box is now prepopulated by some project users (limited by paging), search will only search in projects users as well.<br>
