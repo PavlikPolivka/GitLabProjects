@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.ppolivka.gitlabprojects</id>
     <name>GitLab Projects</name>
-    <version>1.4.6</version>
+    <version>1.4.7</version>
     <vendor email="polivka.pavel@gmail.com" url="http://ppolivka.com">Pavel Polivka</vendor>
 
     <description><![CDATA[
