@@ -25,6 +25,8 @@ public class GitLabUtilTest {
   @Test
   public void isGitLabUrl() throws Exception {
     testUrl("https://gitlab.com/", "https://gitlab.com/Polivka/130regression.git", true);
+    testUrl("https://gitlab.com", "https://gitlab.com/Polivka/130regression.git", true);
+    testUrl("https://gitlab.com", "https://gitlab.com/Polivka/130regression", true);
     testUrl("https://gitlab.com:8080/", "https://gitlab.com:8080/Polivka/130regression.git", true);
     testUrl("https://gitlab.com:8080/", "https://gitlab.com:8084/Polivka/130regression.git", true);
     testUrl("https://gitlab.com:8080/", "http://gitlab.com:8084/Polivka/130regression.git", true);
