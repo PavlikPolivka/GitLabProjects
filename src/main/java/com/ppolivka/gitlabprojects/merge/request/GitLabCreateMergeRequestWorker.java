@@ -68,6 +68,12 @@ public class GitLabCreateMergeRequestWorker implements GitLabMergeRequestWorker 
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
 
+                if(title.startsWith("WIP:")) {
+                    projectState.setMergeAsWorkInProgress(true);
+                } else {
+                    projectState.setMergeAsWorkInProgress(false);
+                }
+
                 projectState.setDeleteMergedBranch(removeSourceBranch);
 
                 indicator.setText("Pushing current branch...");
@@ -82,7 +88,7 @@ public class GitLabCreateMergeRequestWorker implements GitLabMergeRequestWorker 
                 try {
                     mergeRequest = settingsState.api().createMergeRequest(gitlabProject, assignee, gitLocalBranch.getName(), branch.getName(), title, description, removeSourceBranch);
                 } catch (IOException e) {
-                    showErrorDialog(project, "Cannot create Merge Request vis GitLab REST API", CANNOT_CREATE_MERGE_REQUEST);
+                    showErrorDialog(project, "Cannot create Merge Request via GitLab REST API", CANNOT_CREATE_MERGE_REQUEST);
                     return;
                 }
                 VcsNotifier.getInstance(project)

@@ -40,6 +40,7 @@ public class ProjectState implements PersistentStateComponent<ProjectState.State
         public Integer projectId;
         public String lastMergedBranch;
         public Boolean deleteMergedBranch;
+        public Boolean mergeAsWorkInProgress;
     }
 
     public Integer getProjectId() {
@@ -65,5 +66,14 @@ public class ProjectState implements PersistentStateComponent<ProjectState.State
     public void setDeleteMergedBranch(Boolean deleteMergedBranch) {
         projectState.deleteMergedBranch = deleteMergedBranch;
     }
+
+    public Boolean getMergeAsWorkInProgress() {
+        return projectState.mergeAsWorkInProgress;
+    }
+
+    public void setMergeAsWorkInProgress(Boolean mergeAsWorkInProgress) {
+        projectState.mergeAsWorkInProgress = mergeAsWorkInProgress;
+    }
+
 
 }

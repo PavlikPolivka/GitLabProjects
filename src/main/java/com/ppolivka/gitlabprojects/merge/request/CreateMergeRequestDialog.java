@@ -33,6 +33,7 @@ public class CreateMergeRequestDialog extends DialogWrapper {
     private JButton diffButton;
     private JComboBox assigneeBox;
     private JCheckBox removeSourceBranch;
+    private JCheckBox wip;
 
     private SortedComboBoxModel<BranchInfo> myBranchModel;
     private BranchInfo lastSelectedBranch;
@@ -55,7 +56,6 @@ public class CreateMergeRequestDialog extends DialogWrapper {
     protected void init() {
         super.init();
         setTitle("Create Merge Request");
-        setHorizontalStretch(1.5f);
         setVerticalStretch(2f);
 
         SearchBoxModel searchBoxModel = new SearchBoxModel(assigneeBox, mergeRequestWorker.getSearchableUsers());
@@ -89,6 +89,11 @@ public class CreateMergeRequestDialog extends DialogWrapper {
             this.removeSourceBranch.setSelected(true);
         }
 
+        Boolean mergeAsWorkInProgress = projectState.getMergeAsWorkInProgress();
+        if(mergeAsWorkInProgress != null && mergeAsWorkInProgress) {
+            this.wip.setSelected(true);
+        }
+
         diffButton.addActionListener(e -> mergeRequestWorker.getDiffViewWorker().showDiffDialog(mergeRequestWorker.getLocalBranchInfo(), getSelectedBranch()));
     }
 
@@ -96,7 +101,11 @@ public class CreateMergeRequestDialog extends DialogWrapper {
     protected void doOKAction() {
         BranchInfo branch = getSelectedBranch();
         if (mergeRequestWorker.checkAction(branch)) {
-            mergeRequestWorker.createMergeRequest(branch, getAssignee(), mergeTitle.getText(), mergeDescription.getText(), removeSourceBranch.isSelected());
+            String title = mergeTitle.getText();
+            if(wip.isSelected()) {
+                title = "WIP:"+title;
+            }
+            mergeRequestWorker.createMergeRequest(branch, getAssignee(), title, mergeDescription.getText(), removeSourceBranch.isSelected());
             super.doOKAction();
         }
     }

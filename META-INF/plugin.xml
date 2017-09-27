@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.ppolivka.gitlabprojects</id>
     <name>GitLab Projects</name>
-    <version>1.4.7</version>
+    <version>1.4.8</version>
     <vendor email="polivka.pavel@gmail.com" url="http://ppolivka.com">Pavel Polivka</vendor>
 
     <description><![CDATA[
@@ -17,77 +17,8 @@
     ]]></description>
 
     <change-notes><![CDATA[
-        <br><b>1.4.7</b><br>
-        Fixes the bug when sometimes merge request dialogs did not work.<br>
-
-        <br><b>1.4.6</b><br>
-        Admin will see just "their" projects, if you want to see something add your self to the project. This is done to speed the project listing up.<br>
-        Assignee box is now prepopulated by some project users (limited by paging), search will only search in projects users as well.<br>
-
-        <br><b>1.4.5</b><br>
-        Multiple remotes in one IDE project fix.<br>
-        Slow settings url validation fix.<br>
-
-        <br><b>1.4.4</b><br>
-        Design changes to improve setting dialog for new users<br>
-
-        <br><b>1.4.3</b><br>
-        Remove source branch checkbox will stay in same stay for next merge request<br>
-
-        <br><b>1.4.2</b><br>
-        Fix for checkout error<br>
-
-        <br><b>1.4.1</b><br>
-        Added remove source branch checkbox to merge request creation<br>
-        Less strict project resolving for merge request actions<br>
-        Fix for ClassCastException when using creating merge request<br>
-
-        <br><b>1.4.0</b><br>
-        <b>Selection of assignee when creating merge request</b><br>
-
-        <br><b>1.3.6</b><br>
-        Fix for repo url recognition<br>
-
-        <br><b>1.3.5</b><br>
-        Design fix for Create merge request dialog<br>
-
-        <br><b>1.3.4</b><br>
-        Fix for merge request listing and creation<br>
-
-        <br><b>1.3.3</b><br>
-        Fix for cannot find remote error<br>
-
-        <br><b>1.3.2</b><br>
-        Migrating plugin to Java 8<br>
-        Null pointer fixes<br>
-        <b>Added support for comments</b><br>
-
-        <br><b>1.3.1</b></br>
-        Fix for hi-res monitors<br>
-
-        <br><b>1.3.0</b></br>
-        Added support for listing and accepting merge requests<br>
-        GitLab Menu group moved to Git section, this way its only visible if there is Git defined in a project.<br>
-        Unified checks for GitLab API Settings,now runs in background Modal dialog<br>
-
-        <br><b>1.2.3</b></br>
-        Fix for Share Dialog NPE<br>
-
-        <br><b>1.2.2</b></br>
-        Fix for exception occurring during double shift search<br>
-
-        <br><b>1.2.1</b></br>
-        Create Merge Request dialog fix<br>
-
-        <br><b>1.2.0</b><br>
-        New GitLab logo<br>
-        Add Create Merge Request Dialog<br>
-
-        <br><b>1.1.0</b><br>
-        Added support for Import to VCS<br>
-
-        <br><b>1.0.0</b><br>
-        Added support for GitLab Checkout Dialog<br>
+        <br><b>1.4.8</b><br>
+        Adding mark merge request as Work In Progress checkbox.<br>
     ]]>
     </change-notes>
 
