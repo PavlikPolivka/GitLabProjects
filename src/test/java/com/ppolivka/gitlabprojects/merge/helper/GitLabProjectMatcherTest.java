@@ -31,11 +31,6 @@ public class GitLabProjectMatcherTest {
     }
 
     @Test
-    public void resolveProjectValidSsh() throws Exception {
-        testResolving("git@gitlab.com:Polivka/kugkg.git", "git@gitlab.com:Polivka/kugkg.git", true, true);
-    }
-
-    @Test
     public void resolveProjectValidHttp() throws Exception {
         testResolving("https://gitlab.com/Polivka/kugkg.git", "https://gitlab.com/Polivka/kugkg.git", false, true);
     }
@@ -46,11 +41,6 @@ public class GitLabProjectMatcherTest {
     }
 
     @Test
-    public void resolveProjectValidDotGit() throws Exception {
-        testResolving("git@a.git.test.com:8084:Polivka/130regression.git", "git@a.git.test.com:8084:Polivka/130regression.git", true, true);
-    }
-
-    @Test
     public void resolveProjectNotResolvingSsh() throws Exception {
         testResolving("git@gitlab1.com:Polivka/kugkg", "git@gitlab2.com:Polivka/kugkg.git", true, false);
     }
@@ -58,11 +48,6 @@ public class GitLabProjectMatcherTest {
     @Test
     public void resolveProjectNotResolvingHttp() throws Exception {
         testResolving("https://gitlab1.com/Polivka/kugkg", "https://gitlab2.com/Polivka/kugkg.git", false, false);
-    }
-
-    @Test
-    public void resolveProjectMissingSuffixSsh() throws Exception {
-        testResolving("git@gitlab.com:Polivka/kugkg", "git@gitlab.com:Polivka/kugkg.git", true, true);
     }
 
     @Test

@@ -1,7 +1,7 @@
-<idea-plugin version="2">
+<idea-plugin>
     <id>com.ppolivka.gitlabprojects</id>
     <name>GitLab Projects</name>
-    <version>1.4.8</version>
+    <version>1.4.9</version>
     <vendor email="polivka.pavel@gmail.com" url="http://ppolivka.com">Pavel Polivka</vendor>
 
     <description><![CDATA[
@@ -17,8 +17,7 @@
     ]]></description>
 
     <change-notes><![CDATA[
-        <br><b>1.4.8</b><br>
-        Adding mark merge request as Work In Progress checkbox.<br>
+        Plugin migrated to gradle build.<br>
     ]]>
     </change-notes>
 

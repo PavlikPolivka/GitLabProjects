@@ -1,0 +1,19 @@
+plugins {
+    id "org.jetbrains.intellij" version "0.2.13"
+}
+
+intellij {
+    version 'IC-2016.1'
+    updateSinceUntilBuild false
+    plugins 'Git4idea'
+    pluginName 'GitLabProjects'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'commons-io', name: 'commons-io', version: '2.4'
+    compile group: 'org.gitlab', name: 'java-gitlab-api', version: '1.2.5'
+}

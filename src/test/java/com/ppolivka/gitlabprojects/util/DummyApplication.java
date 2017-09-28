@@ -163,11 +163,6 @@ public class DummyApplication implements Application {
 
   }
 
-  @Override
-  public void invokeAndWait(@NotNull Runnable runnable) throws ProcessCanceledException {
-
-  }
-
   @NotNull
   @Override
   public ModalityState getCurrentModalityState() {
