@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/PavlikPolivka/GitLabProjects.svg?branch=master)](https://travis-ci.org/PavlikPolivka/GitLabProjects)
+
 ## GitLab Projects
 Simple plugin that is adding support for GitLab specific actions to JetBrain IDEs
 
