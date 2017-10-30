@@ -87,6 +87,10 @@ public class ApiFacade {
         requestor.to(tailUrl, mergeRequest);
     }
 
+    public void changeAssignee(GitlabProject project, GitlabMergeRequest mergeRequest, GitlabUser user) throws IOException {
+        api.updateMergeRequest(project.getId(), mergeRequest.getId(), null, user.getId(), null, null, null, null);
+    }
+
     public GitlabProject createProject(String name, int visibilityLevel, boolean isPublic, NamespaceDto namespace, String description) throws IOException {
         return api.createProject(
                 name,
@@ -147,5 +151,10 @@ public class ApiFacade {
             users = Arrays.asList(response);
         }
         return users;
+    }
+
+    public GitlabUser getCurrentUser() throws IOException {
+        checkApi();
+        return api.getUser();
     }
 }

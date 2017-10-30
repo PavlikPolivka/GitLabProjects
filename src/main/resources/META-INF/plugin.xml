@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.ppolivka.gitlabprojects</id>
     <name>GitLab Projects</name>
-    <version>1.4.9</version>
+    <version>1.4.10</version>
     <vendor email="polivka.pavel@gmail.com" url="http://ppolivka.com">Pavel Polivka</vendor>
 
     <description><![CDATA[
@@ -17,7 +17,9 @@
     ]]></description>
 
     <change-notes><![CDATA[
-        Plugin migrated to gradle build.<br>
+        Adding assignee info to list of merge requests. <br>
+        Adding assignee info to code review dialog. <br>
+        Adding option to assign merge request to me to code review dialog. <br>
     ]]>
     </change-notes>
 

@@ -40,13 +40,14 @@ public class GitLabMergeRequestListDialog extends DialogWrapper {
 
         setOKActionEnabled(false);
         setOKButtonText("Code Review");
+        setHorizontalStretch(2);
 
         List<GitlabMergeRequest> mergeRequests = mergeRequestListWorker.getMergeRequests();
         listOfRequests.setModel(mergeRequestModel(mergeRequests));
         listOfRequests.getColumnModel().getColumn(0).setPreferredWidth(200);
-        listOfRequests.getColumnModel().getColumn(4).setWidth(0);
-        listOfRequests.getColumnModel().getColumn(4).setMinWidth(0);
-        listOfRequests.getColumnModel().getColumn(4).setMaxWidth(0);
+        listOfRequests.getColumnModel().getColumn(5).setWidth(0);
+        listOfRequests.getColumnModel().getColumn(5).setMinWidth(0);
+        listOfRequests.getColumnModel().getColumn(5).setMaxWidth(0);
         listOfRequests.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         listOfRequests.getSelectionModel().addListSelectionListener(event -> setOKActionEnabled(true));
@@ -55,25 +56,30 @@ public class GitLabMergeRequestListDialog extends DialogWrapper {
     @Override
     protected void doOKAction() {
         GitlabMergeRequest mergeRequest =
-                (GitlabMergeRequest) listOfRequests.getValueAt(listOfRequests.getSelectedRow(), 4);
+                (GitlabMergeRequest) listOfRequests.getValueAt(listOfRequests.getSelectedRow(), 5);
         CodeReviewDialog codeReviewDialog = new CodeReviewDialog(project, mergeRequest, mergeRequestListWorker);
         codeReviewDialog.show();
-        if(codeReviewDialog.isOK()) {
+        if (codeReviewDialog.isOK()) {
             super.doOKAction();
         }
     }
 
     private TableModel mergeRequestModel(List<GitlabMergeRequest> mergeRequests) {
-        Object[] columnNames = {"Merge request", "Author", "Source", "Target",""};
+        Object[] columnNames = {"Merge request", "Author", "Source", "Target", "Assignee", ""};
         Object[][] data = new Object[mergeRequests.size()][columnNames.length];
         int i = 0;
-        for(GitlabMergeRequest mergeRequest : mergeRequests) {
+        for (GitlabMergeRequest mergeRequest : mergeRequests) {
             Object[] row = new Object[columnNames.length];
             row[0] = mergeRequest.getTitle();
             row[1] = mergeRequest.getAuthor().getName();
             row[2] = mergeRequest.getSourceBranch();
             row[3] = mergeRequest.getTargetBranch();
-            row[4] = mergeRequest;
+            String assignee = "";
+            if (mergeRequest.getAssignee() != null) {
+                assignee = mergeRequest.getAssignee().getName();
+            }
+            row[4] = assignee;
+            row[5] = mergeRequest;
             data[i] = row;
             i++;
         }
