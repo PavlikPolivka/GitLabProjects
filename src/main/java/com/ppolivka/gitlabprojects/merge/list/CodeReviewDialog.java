@@ -43,6 +43,8 @@ public class CodeReviewDialog extends DialogWrapper {
     private JLabel assigneeName;
     private JButton assignMe;
 
+    SettingsState settingsState = SettingsState.getInstance();
+
     private boolean diffClicked = false;
 
     protected CodeReviewDialog(@Nullable Project project,
@@ -68,6 +70,8 @@ public class CodeReviewDialog extends DialogWrapper {
         targetBranch = createBranchInfo(mergeRequest.getTargetBranch());
 
         requestName.setText(mergeRequest.getTitle());
+
+        removeSourceBranchCheckBox.setSelected(settingsState.isDefaultRemoveBranch());
 
         String assignee = "";
         if (mergeRequest.getAssignee() != null) {
