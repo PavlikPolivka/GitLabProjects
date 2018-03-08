@@ -41,6 +41,7 @@ public class SettingsView implements SearchableConfigurable {
     private JTextField textHost;
     private JTextField textAPI;
     private JButton apiHelpButton;
+    private JCheckBox defaultRemoveBranch;
 
     public void setup() {
         onServerChange();
@@ -139,7 +140,8 @@ public class SettingsView implements SearchableConfigurable {
         String[] save = save();
         return save == null
                 || !save[0].equals(settingsState.getHost())
-                || !save[1].equals(settingsState.getToken());
+                || !save[1].equals(settingsState.getToken())
+                || defaultRemoveBranch.isSelected() != settingsState.isDefaultRemoveBranch();
     }
 
     @Override
@@ -147,6 +149,7 @@ public class SettingsView implements SearchableConfigurable {
         String[] save = save();
         settingsState.setHost(save[0]);
         settingsState.setToken(save[1]);
+        settingsState.setDefaultRemoveBranch(defaultRemoveBranch.isSelected());
     }
 
     @Override
@@ -164,6 +167,7 @@ public class SettingsView implements SearchableConfigurable {
     public void fill(SettingsState settingsState) {
         textHost.setText(settingsState == null ? "" : settingsState.getHost());
         textAPI.setText(settingsState == null ? "" : settingsState.getToken());
+        defaultRemoveBranch.setSelected(settingsState == null ? true : settingsState.isDefaultRemoveBranch());
     }
 
     public String[] save() {

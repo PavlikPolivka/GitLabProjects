@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.ppolivka.gitlabprojects</id>
     <name>GitLab Projects</name>
-    <version>1.4.10</version>
+    <version>1.4.11</version>
     <vendor email="polivka.pavel@gmail.com" url="http://ppolivka.com">Pavel Polivka</vendor>
 
     <description><![CDATA[
@@ -17,9 +17,7 @@
     ]]></description>
 
     <change-notes><![CDATA[
-        Adding assignee info to list of merge requests. <br>
-        Adding assignee info to code review dialog. <br>
-        Adding option to assign merge request to me to code review dialog. <br>
+        Adding a feature to disable the default remove branch when merged (author: pdesmet)
     ]]>
     </change-notes>
 

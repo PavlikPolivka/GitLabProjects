@@ -33,6 +33,8 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
 
     public String token;
 
+    public boolean defaultRemoveBranch;
+
     public Collection<ProjectDto> projects = new ArrayList<>();
 
     public static SettingsState getInstance() {
@@ -93,6 +95,14 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public boolean isDefaultRemoveBranch() {
+        return defaultRemoveBranch;
+    }
+
+    public void setDefaultRemoveBranch(boolean defaultRemoveBranch) {
+        this.defaultRemoveBranch = defaultRemoveBranch;
     }
 
     public Collection<ProjectDto> getProjects() {
