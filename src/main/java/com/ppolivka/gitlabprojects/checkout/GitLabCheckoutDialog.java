@@ -8,9 +8,11 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.ui.CollectionComboBoxModel;
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.JBImageIcon;
 import com.ppolivka.gitlabprojects.api.dto.ProjectDto;
+import com.ppolivka.gitlabprojects.api.dto.ServerDto;
 import com.ppolivka.gitlabprojects.common.GitLabIcons;
 import com.ppolivka.gitlabprojects.configuration.SettingsDialog;
 import com.ppolivka.gitlabprojects.configuration.SettingsState;
@@ -30,7 +32,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.intellij.ui.JBColor.WHITE;
-import static com.ppolivka.gitlabprojects.common.GitLabApiAction.validateGitLabApi;
 import static com.ppolivka.gitlabprojects.util.MessageUtil.showErrorDialog;
 
 /**
@@ -45,8 +46,8 @@ public class GitLabCheckoutDialog extends DialogWrapper {
 
     private JPanel mainView;
     private JButton refreshButton;
-    private JButton settingsButton;
     private JTree allProjects;
+    private JComboBox serverList;
 
     private SettingsState settingsState = SettingsState.getInstance();
 
@@ -73,7 +74,6 @@ public class GitLabCheckoutDialog extends DialogWrapper {
 
         Border emptyBorder = BorderFactory.createCompoundBorder();
         refreshButton.setBorder(emptyBorder);
-        settingsButton.setBorder(emptyBorder);
 
         settingsDialogActionListener = new ActionListener() {
             @Override
@@ -89,6 +89,11 @@ public class GitLabCheckoutDialog extends DialogWrapper {
                 }
             }
         };
+
+        ArrayList<ServerDto> servers = new ArrayList<>(settingsState.getServers());
+        CollectionComboBoxModel collectionComboBoxModel = new CollectionComboBoxModel(servers, servers.get(0));
+        serverList.setModel(collectionComboBoxModel);
+
 
         listingCellRenderer.setClosedIcon(AllIcons.Nodes.TreeClosed);
         listingCellRenderer.setOpenIcon(AllIcons.Nodes.TreeOpen);
@@ -131,9 +136,12 @@ public class GitLabCheckoutDialog extends DialogWrapper {
 
             }
         });
-        settingsButton.addActionListener(settingsDialogActionListener);
         Collection<ProjectDto> projectDtos = settingsState.getProjects();
         reDrawTree(projectDtos == null ? noProjects() : projectDtos);
+
+        serverList.addActionListener(e -> {
+            refreshTree();
+        });
 
     }
 
@@ -151,7 +159,7 @@ public class GitLabCheckoutDialog extends DialogWrapper {
     }
 
     private void refreshTree() {
-        if(!validateGitLabApi(project)) {
+        if(serverList.getSelectedItem() == null) {
             return;
         }
         treeLoading();
@@ -159,7 +167,7 @@ public class GitLabCheckoutDialog extends DialogWrapper {
             @Override
             public void run(@NotNull ProgressIndicator progressIndicator) {
                 try {
-                    settingsState.reloadProjects();
+                    settingsState.reloadProjects((ServerDto) serverList.getSelectedItem());
                     reDrawTree(settingsState.getProjects());
                 } catch (Throwable e) {
                     showErrorDialog(project, "Cannot log-in to GitLab Server with provided token", "Cannot Login To GitLab");

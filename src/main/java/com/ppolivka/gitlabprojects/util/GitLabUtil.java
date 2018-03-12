@@ -79,7 +79,7 @@ public class GitLabUtil {
     public static Pair<GitRemote, String> findGitLabRemote(@NotNull GitRepository repository) {
         for (GitRemote gitRemote : repository.getRemotes()) {
             for (String remoteUrl : gitRemote.getUrls()) {
-                if (isGitLabUrl(remoteUrl)) {
+                if (isGitLabUrl(settingsState.currentGitlabServer(repository).getHost(), remoteUrl)) {
                   return Pair.create(gitRemote, gitRemote.getName());
                 }
             }
@@ -87,9 +87,10 @@ public class GitLabUtil {
         return null;
     }
 
-    public static boolean isGitLabUrl(String url) {
+
+    public static boolean isGitLabUrl(String testUrl, String url) {
       try {
-        URI fromSettings = new URI(settingsState.getHost());
+        URI fromSettings = new URI(testUrl);
         String fromSettingsHost = fromSettings.getHost();
 
         String patternString = "(\\w+://)(.+@)*([\\w\\d\\.\\-]+)(:[\\d]+){0,1}/*(.*)|(.+@)*([\\w\\d\\.\\-]+):(.*)";

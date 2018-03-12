@@ -1,12 +1,16 @@
 package com.ppolivka.gitlabprojects.merge.helper;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.ppolivka.gitlabprojects.api.ApiFacade;
+import com.ppolivka.gitlabprojects.api.dto.ServerDto;
 import com.ppolivka.gitlabprojects.configuration.ProjectState;
 import com.ppolivka.gitlabprojects.configuration.SettingsState;
 import com.ppolivka.gitlabprojects.util.DummyApplication;
 import com.ppolivka.gitlabprojects.util.DummyDisposable;
 import git4idea.repo.GitRemote;
+import git4idea.repo.GitRepository;
 import org.gitlab.api.models.GitlabProject;
 import org.junit.Assert;
 import org.junit.Before;
@@ -60,7 +64,7 @@ public class GitLabProjectMatcherTest {
         GitRemote remote = remote("origin", remoteUrl);
         GitlabProject project = project(1, projectUrl, ssh);
         settingsState.addProject(1, project);
-        Optional<GitlabProject> resolvedProject = gitLabProjectMatcher.resolveProject(projectState, remote);
+        Optional<GitlabProject> resolvedProject = gitLabProjectMatcher.resolveProject(projectState, remote, null);
         Assert.assertNotNull(resolvedProject);
         Assert.assertEquals(shouldBeResolved, resolvedProject.isPresent());
     }
@@ -106,7 +110,17 @@ public class GitLabProjectMatcherTest {
         DummyApiFacade apiFacade = new DummyApiFacade();
 
         @Override
-        public ApiFacade api() {
+        public ApiFacade api(Project project, VirtualFile file) {
+            return apiFacade;
+        }
+
+        @Override
+        public ApiFacade api(GitRepository gitRepository) {
+            return apiFacade;
+        }
+
+        @Override
+        public ApiFacade api(ServerDto serverDto) {
             return apiFacade;
         }
 

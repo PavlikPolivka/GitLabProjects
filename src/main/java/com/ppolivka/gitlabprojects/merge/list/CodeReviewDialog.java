@@ -3,6 +3,7 @@ package com.ppolivka.gitlabprojects.merge.list;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.containers.Convertor;
 import com.ppolivka.gitlabprojects.comment.CommentsDialog;
 import com.ppolivka.gitlabprojects.comment.GitLabCommentsListWorker;
@@ -30,6 +31,7 @@ public class CodeReviewDialog extends DialogWrapper {
     final private GitLabMergeRequestListWorker mergeRequestWorker;
 
     private Project project;
+    private VirtualFile virtualFile;
     private BranchInfo sourceBranch;
     private BranchInfo targetBranch;
 
@@ -49,7 +51,9 @@ public class CodeReviewDialog extends DialogWrapper {
 
     protected CodeReviewDialog(@Nullable Project project,
                                @NotNull GitlabMergeRequest mergeRequest,
-                               @NotNull GitLabMergeRequestListWorker mergeRequestWorker) {
+                               @NotNull GitLabMergeRequestListWorker mergeRequestWorker,
+                               VirtualFile virtualFile
+    ) {
         super(project);
         this.project = project;
         this.mergeRequest = mergeRequest;
@@ -85,8 +89,8 @@ public class CodeReviewDialog extends DialogWrapper {
         });
 
         commentsButton.addActionListener(e -> {
-            GitLabCommentsListWorker commentsListWorker = GitLabCommentsListWorker.create(project, mergeRequest);
-            CommentsDialog commentsDialog = new CommentsDialog(project, commentsListWorker);
+            GitLabCommentsListWorker commentsListWorker = GitLabCommentsListWorker.create(project, mergeRequest, virtualFile);
+            CommentsDialog commentsDialog = new CommentsDialog(project, commentsListWorker, virtualFile);
             commentsDialog.show();
         });
 
@@ -94,8 +98,8 @@ public class CodeReviewDialog extends DialogWrapper {
             GitLabUtil.computeValueInModal(project, "Changing assignee...", (Convertor<ProgressIndicator, Void>) o -> {
                 try {
                     SettingsState settingsState = SettingsState.getInstance();
-                    GitlabUser currentUser = settingsState.api().getCurrentUser();
-                    settingsState.api().changeAssignee(
+                    GitlabUser currentUser = settingsState.api(mergeRequestWorker.getGitRepository()).getCurrentUser();
+                    settingsState.api(mergeRequestWorker.getGitRepository()).changeAssignee(
                             mergeRequestWorker.getGitlabProject(),
                             mergeRequest,
                             currentUser

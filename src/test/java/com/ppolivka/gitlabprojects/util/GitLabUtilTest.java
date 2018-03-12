@@ -44,7 +44,7 @@ public class GitLabUtilTest {
 
   private void testUrl(String settings, String remote, boolean shouldBe) {
     settingsState.setHost(settings);
-    Assert.assertEquals(GitLabUtil.isGitLabUrl(remote), shouldBe);
+    Assert.assertEquals(GitLabUtil.isGitLabUrl(settings, remote), shouldBe);
   }
 
 }

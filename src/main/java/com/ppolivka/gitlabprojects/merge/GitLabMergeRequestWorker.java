@@ -96,10 +96,10 @@ public interface GitLabMergeRequestWorker {
 
       try {
         Integer projectId;
-        Optional<GitlabProject> gitlabProject = projectMatcher.resolveProject(projectState, remote.getFirst());
+        Optional<GitlabProject> gitlabProject = projectMatcher.resolveProject(projectState, remote.getFirst(), gitRepository);
         projectId = gitlabProject.orElseThrow(() -> new RuntimeException("No project found")).getId();
 
-        mergeRequestWorker.setGitlabProject(settingsState.api().getProject(projectId));
+        mergeRequestWorker.setGitlabProject(settingsState.api(gitRepository).getProject(projectId));
       } catch (Exception e) {
         showErrorDialog(project, "Cannot find this project in GitLab Remote", CANNOT_CREATE_MERGE_REQUEST);
         throw new MergeRequestException(e);

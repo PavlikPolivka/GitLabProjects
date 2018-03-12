@@ -3,6 +3,9 @@ package com.ppolivka.gitlabprojects.configuration;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.ui.ValidationInfo;
+import com.ppolivka.gitlabprojects.api.dto.ServerDto;
+import com.ppolivka.gitlabprojects.common.ReadOnlyTableModel;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -10,12 +13,14 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URI;
 import java.net.UnknownHostException;
+import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -42,6 +47,10 @@ public class SettingsView implements SearchableConfigurable {
     private JTextField textAPI;
     private JButton apiHelpButton;
     private JCheckBox defaultRemoveBranch;
+    private JTable serverTable;
+    private JButton addNewOneButton;
+    private JButton editButton;
+    private JButton deleteButton;
 
     public void setup() {
         onServerChange();
@@ -67,12 +76,70 @@ public class SettingsView implements SearchableConfigurable {
                 openWebPage(generateHelpUrl());
             }
         });
+        addNewOneButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ServerDto serverDto = new ServerDto();
+                serverDto.setHost(textHost.getText());
+                serverDto.setToken(textAPI.getText());
+                serverDto.setDefaultRemoveBranch(defaultRemoveBranch.isSelected());
+                settingsState.addServer(serverDto);
+                reset();
+            }
+        });
+        deleteButton.addActionListener(e -> {
+            ServerDto serverDto = getSelectedServer();
+            if(serverDto != null) {
+                settingsState.deleteServer(serverDto);
+                reset();
+            }
+        });
+        editButton.addActionListener(e -> {
+            ServerDto serverDto = getSelectedServer();
+            if(serverDto != null) {
+                textHost.setText(serverDto.getHost());
+                textAPI.setText(serverDto.getToken());
+                defaultRemoveBranch.setSelected(serverDto.isDefaultRemoveBranch());
+            }
+        });
+    }
+
+    private ServerDto getSelectedServer() {
+        if(serverTable.getSelectedRow() >= 0) {
+            String host = (String) serverTable.getValueAt(serverTable.getSelectedRow(), 0);
+            String token = (String) serverTable.getValueAt(serverTable.getSelectedRow(), 1);
+            boolean mergeDefault = (Boolean) serverTable.getValueAt(serverTable.getSelectedRow(), 2);
+            ServerDto serverDto = new ServerDto();
+            serverDto.setHost(host);
+            serverDto.setToken(token);
+            serverDto.setDefaultRemoveBranch(mergeDefault);
+            return serverDto;
+        }
+        return null;
+    }
+
+    private TableModel serverModel(Collection<ServerDto> servers) {
+        Object[] columnNames = {"Server", "Token", "Default merged"};
+        Object[][] data = new Object[servers.size()][columnNames.length];
+        int i = 0;
+        for (ServerDto server : servers) {
+            Object[] row = new Object[columnNames.length];
+            row[0] = server.getHost();
+            row[1] = server.getToken();
+            row[2] = server.isDefaultRemoveBranch();
+            data[i] = row;
+            i++;
+        }
+        return new ReadOnlyTableModel(data, columnNames);
     }
 
     @Nullable
     public ValidationInfo doValidate(long timeout) {
         final String hostText = textHost.getText();
         final String apiText = textAPI.getText();
+        if(StringUtils.isBlank(hostText) && StringUtils.isBlank(apiText) && settingsState.getServers().size() > 0) {
+            return null;
+        }
         try {
             if (isModified() && isNotBlank(hostText) && isNotBlank(apiText)) {
                 if (!isValidUrl(hostText)) {
@@ -168,6 +235,13 @@ public class SettingsView implements SearchableConfigurable {
         textHost.setText(settingsState == null ? "" : settingsState.getHost());
         textAPI.setText(settingsState == null ? "" : settingsState.getToken());
         defaultRemoveBranch.setSelected(settingsState == null ? true : settingsState.isDefaultRemoveBranch());
+        serverTable.setModel(serverModel(settingsState.getServers()));
+        serverTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        serverTable.getSelectionModel().addListSelectionListener(event -> {
+            editButton.setEnabled(true);
+            deleteButton.setEnabled(true);
+        });
+
     }
 
     public String[] save() {
@@ -192,8 +266,10 @@ public class SettingsView implements SearchableConfigurable {
         if (validationInfo == null || (validationInfo != null && !validationInfo.message.equals(SettingError.NOT_A_URL.message))) {
             apiHelpButton.setEnabled(true);
             apiHelpButton.setToolTipText("API Key can be find in your profile setting inside GitLab Server: \n" + generateHelpUrl());
+            addNewOneButton.setEnabled(true);
         } else {
             apiHelpButton.setEnabled(false);
+            addNewOneButton.setEnabled(false);
         }
     }
 

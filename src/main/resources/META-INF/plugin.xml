@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.ppolivka.gitlabprojects</id>
     <name>GitLab Projects</name>
-    <version>1.4.11</version>
+    <version>1.5.0</version>
     <vendor email="polivka.pavel@gmail.com" url="http://ppolivka.com">Pavel Polivka</vendor>
 
     <description><![CDATA[
@@ -17,7 +17,10 @@
     ]]></description>
 
     <change-notes><![CDATA[
-        Adding a feature to disable the default remove branch when merged (author: pdesmet)
+        Adding support for multiple GitLab servers. <br>
+        Add all of them to settings dialog. <br>
+        Where possible plugin will detect correct remote, where not (import, checkout) there is select box with all remotes.<br>
+        <b>This is not a very stable feature, please report all issues. I will try to fix them as soon as possible</b>
     ]]>
     </change-notes>
 

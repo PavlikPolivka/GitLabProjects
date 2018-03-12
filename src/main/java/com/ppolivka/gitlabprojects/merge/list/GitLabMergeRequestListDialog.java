@@ -2,6 +2,7 @@ package com.ppolivka.gitlabprojects.merge.list;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.ppolivka.gitlabprojects.common.ReadOnlyTableModel;
 import org.gitlab.api.models.GitlabMergeRequest;
 import org.jetbrains.annotations.NotNull;
@@ -23,13 +24,15 @@ public class GitLabMergeRequestListDialog extends DialogWrapper {
     private JTable listOfRequests;
 
     private Project project;
+    private VirtualFile file;
 
     final GitLabMergeRequestListWorker mergeRequestListWorker;
 
-    public GitLabMergeRequestListDialog(@Nullable Project project, @NotNull GitLabMergeRequestListWorker mergeRequestListWorker) {
+    public GitLabMergeRequestListDialog(@Nullable Project project, @NotNull GitLabMergeRequestListWorker mergeRequestListWorker, VirtualFile file) {
         super(project);
         this.project = project;
         this.mergeRequestListWorker = mergeRequestListWorker;
+        this.file = file;
         init();
     }
 
@@ -57,7 +60,7 @@ public class GitLabMergeRequestListDialog extends DialogWrapper {
     protected void doOKAction() {
         GitlabMergeRequest mergeRequest =
                 (GitlabMergeRequest) listOfRequests.getValueAt(listOfRequests.getSelectedRow(), 5);
-        CodeReviewDialog codeReviewDialog = new CodeReviewDialog(project, mergeRequest, mergeRequestListWorker);
+        CodeReviewDialog codeReviewDialog = new CodeReviewDialog(project, mergeRequest, mergeRequestListWorker, file);
         codeReviewDialog.show();
         if (codeReviewDialog.isOK()) {
             super.doOKAction();

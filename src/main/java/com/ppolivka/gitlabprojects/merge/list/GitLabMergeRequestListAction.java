@@ -20,7 +20,7 @@ public class GitLabMergeRequestListAction extends GitLabApiAction {
     @Override
     public void apiValidAction(AnActionEvent anActionEvent) {
         GitLabMergeRequestListWorker mergeRequestListWorker = GitLabMergeRequestListWorker.create(project, file);
-        GitLabMergeRequestListDialog gitLabMergeRequestListDialog = new GitLabMergeRequestListDialog(project, mergeRequestListWorker);
+        GitLabMergeRequestListDialog gitLabMergeRequestListDialog = new GitLabMergeRequestListDialog(project, mergeRequestListWorker, file);
         DialogManager.show(gitLabMergeRequestListDialog);
 
     }

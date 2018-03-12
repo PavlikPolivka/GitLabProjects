@@ -53,7 +53,7 @@ public class GitLabMergeRequestListWorker implements GitLabMergeRequestWorker {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 try {
-                    settingsState.api().acceptMergeRequest(gitlabProject, mergeRequest, removeSource);
+                    settingsState.api(gitRepository).acceptMergeRequest(gitlabProject, mergeRequest, removeSource);
                     VcsNotifier.getInstance(project)
                             .notifyImportantInfo("Merged", "Merge request is merged.", NotificationListener.URL_OPENING_LISTENER);
                 } catch (IOException e) {
@@ -77,7 +77,7 @@ public class GitLabMergeRequestListWorker implements GitLabMergeRequestWorker {
                 }
 
                 try {
-                    mergeRequestListWorker.setMergeRequests(settingsState.api().getMergeRequests(mergeRequestListWorker.getGitlabProject()));
+                    mergeRequestListWorker.setMergeRequests(settingsState.api(project, file).getMergeRequests(mergeRequestListWorker.getGitlabProject()));
                 } catch (IOException e) {
                     mergeRequestListWorker.setMergeRequests(Collections.<GitlabMergeRequest>emptyList());
                     showErrorDialog(project, "Cannot load merge requests from GitLab API", "Cannot Load Merge Requests");

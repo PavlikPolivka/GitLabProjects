@@ -2,6 +2,7 @@ package com.ppolivka.gitlabprojects.comment;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.ppolivka.gitlabprojects.common.ReadOnlyTableModel;
 import git4idea.DialogManager;
 import org.gitlab.api.models.GitlabNote;
@@ -27,12 +28,14 @@ public class CommentsDialog extends DialogWrapper {
   private JButton addCommentButton;
 
   private Project project;
+  private VirtualFile file;
   private GitLabCommentsListWorker worker;
 
-  public CommentsDialog(@Nullable Project project, GitLabCommentsListWorker worker) {
+  public CommentsDialog(@Nullable Project project, GitLabCommentsListWorker worker, VirtualFile file) {
     super(project);
     this.project = project;
     this.worker = worker;
+    this.file = file;
     init();
   }
 
@@ -57,8 +60,8 @@ public class CommentsDialog extends DialogWrapper {
     });
 
     addCommentButton.addActionListener(e -> {
-      new AddCommentDialog(project, worker.getMergeRequest()).show();
-      this.worker = GitLabCommentsListWorker.create(project, worker.getMergeRequest());
+      new AddCommentDialog(project, worker.getMergeRequest(), file).show();
+      this.worker = GitLabCommentsListWorker.create(project, worker.getMergeRequest(), file);
       reloadModel();
       comments.repaint();
     });

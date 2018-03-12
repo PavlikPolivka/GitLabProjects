@@ -13,8 +13,9 @@ import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.containers.ContainerUtil;
 import com.ppolivka.gitlabprojects.api.dto.NamespaceDto;
-import com.ppolivka.gitlabprojects.common.GitLabApiAction;
+import com.ppolivka.gitlabprojects.api.dto.ServerDto;
 import com.ppolivka.gitlabprojects.common.GitLabIcons;
+import com.ppolivka.gitlabprojects.common.NoGitLabApiAction;
 import com.ppolivka.gitlabprojects.configuration.SettingsState;
 import com.ppolivka.gitlabprojects.util.GitLabUtil;
 import git4idea.GitLocalBranch;
@@ -44,7 +45,7 @@ import static com.ppolivka.gitlabprojects.util.MessageUtil.showInfoMessage;
  * @author ppolivka
  * @since 28.10.2015
  */
-public class GitLabShareAction extends GitLabApiAction {
+public class GitLabShareAction extends NoGitLabApiAction {
 
     private static SettingsState settingsState = SettingsState.getInstance();
 
@@ -109,7 +110,7 @@ public class GitLabShareAction extends GitLabApiAction {
                 GitlabProject gitlabProject;
                 try {
                     indicator.setText("Creating GitLab Repository");
-                    gitlabProject = settingsState.api().createProject(name, visibility, publicity, namespace, "");
+                    gitlabProject = settingsState.api((ServerDto) gitLabShareDialog.getServerList().getSelectedItem()).createProject(name, visibility, publicity, namespace, "");
                 } catch (IOException e) {
                     return;
                 }

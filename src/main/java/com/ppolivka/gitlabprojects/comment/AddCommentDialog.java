@@ -4,6 +4,7 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.containers.Convertor;
 import com.ppolivka.gitlabprojects.configuration.SettingsState;
 import com.ppolivka.gitlabprojects.util.GitLabUtil;
@@ -31,9 +32,10 @@ public class AddCommentDialog extends DialogWrapper {
   private JTextArea commentText;
 
   private Project project;
+  private VirtualFile file;
   private GitlabMergeRequest mergeRequest;
 
-  protected AddCommentDialog(@Nullable Project project, @NotNull GitlabMergeRequest mergeRequest) {
+  protected AddCommentDialog(@Nullable Project project, @NotNull GitlabMergeRequest mergeRequest, VirtualFile file) {
     super(project);
     this.project = project;
     this.mergeRequest = mergeRequest;
@@ -54,7 +56,7 @@ public class AddCommentDialog extends DialogWrapper {
       String comment = commentText.getText();
       if (StringUtils.isNotBlank(comment)) {
         try {
-          settingsState.api().addComment(mergeRequest, comment);
+          settingsState.api(project, file).addComment(mergeRequest, comment);
         } catch (IOException e) {
           showErrorDialog(project, "Cannot add comment.", "Cannot Add Comment");
         }

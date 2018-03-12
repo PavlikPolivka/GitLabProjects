@@ -51,7 +51,7 @@ public abstract class GitLabApiAction extends DumbAwareAction {
             return;
         }
 
-        if(!validateGitLabApi(project)) {
+        if(!validateGitLabApi(project, file)) {
             return;
         }
 
@@ -74,12 +74,12 @@ public abstract class GitLabApiAction extends DumbAwareAction {
      * @param project the project
      * @return true if API is OK, false if not
      */
-    public static boolean validateGitLabApi(@NotNull Project project) {
+    public static boolean validateGitLabApi(@NotNull Project project, VirtualFile virtualFile) {
         Boolean isApiSetup = GitLabUtil.computeValueInModal(project, "Validating GitLab Api...",false, new Convertor<ProgressIndicator, Boolean>() {
             @Override
             public Boolean convert(ProgressIndicator progressIndicator) {
                 try {
-                    settingsState.isApiValid(settingsState.host, settingsState.token);
+                    settingsState.isApiValid(project, virtualFile);
                     return true;
                 } catch (Throwable e) {
                     return false;

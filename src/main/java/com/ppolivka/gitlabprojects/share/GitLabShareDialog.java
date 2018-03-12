@@ -8,6 +8,7 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.CollectionComboBoxModel;
 import com.ppolivka.gitlabprojects.api.dto.NamespaceDto;
+import com.ppolivka.gitlabprojects.api.dto.ServerDto;
 import com.ppolivka.gitlabprojects.configuration.SettingsState;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.Nullable;
@@ -42,6 +43,7 @@ public class GitLabShareDialog extends DialogWrapper {
     private JButton refreshButton;
     private JRadioButton isSSHAuth;
     private JRadioButton isHTTPAuth;
+    private JComboBox serverList;
     private final Project project;
 
     public GitLabShareDialog(@Nullable Project project) {
@@ -55,6 +57,10 @@ public class GitLabShareDialog extends DialogWrapper {
         super.init();
         setTitle("Share on GitLab");
         setOKButtonText("Share");
+
+        ArrayList<ServerDto> servers = new ArrayList<>(settingsState.getServers());
+        CollectionComboBoxModel collectionComboBoxModel = new CollectionComboBoxModel(servers, servers.get(0));
+        serverList.setModel(collectionComboBoxModel);
 
         Border emptyBorder = BorderFactory.createCompoundBorder();
         refreshButton.setBorder(emptyBorder);
@@ -77,6 +83,13 @@ public class GitLabShareDialog extends DialogWrapper {
         reloadGroupList();
 
         refreshButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                reloadGroupList();
+            }
+        });
+
+        serverList.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 reloadGroupList();
@@ -107,7 +120,8 @@ public class GitLabShareDialog extends DialogWrapper {
                         setId(0);
                         setPath("Default");
                     }});
-                    List<NamespaceDto> remoteNamespaces = settingsState.api().getNamespaces();
+                    // TODO Server listing
+                    List<NamespaceDto> remoteNamespaces = settingsState.api((ServerDto) serverList.getSelectedItem()).getNamespaces();
                     if(remoteNamespaces != null) {
                         namespaces.addAll(remoteNamespaces);
                     }
@@ -168,5 +182,13 @@ public class GitLabShareDialog extends DialogWrapper {
 
     public JRadioButton getIsHTTPAuth() {
         return isHTTPAuth;
+    }
+
+    public JComboBox getServerList() {
+        return serverList;
+    }
+
+    public void setServerList(JComboBox serverList) {
+        this.serverList = serverList;
     }
 }

@@ -4,6 +4,7 @@ import com.ppolivka.gitlabprojects.configuration.ProjectState;
 import com.ppolivka.gitlabprojects.configuration.SettingsState;
 import com.ppolivka.gitlabprojects.exception.GitLabException;
 import git4idea.repo.GitRemote;
+import git4idea.repo.GitRepository;
 import org.apache.commons.lang.StringUtils;
 import org.gitlab.api.models.GitlabProject;
 
@@ -14,12 +15,12 @@ public class GitLabProjectMatcher {
 
     private static SettingsState settingsState = SettingsState.getInstance();
 
-    public Optional<GitlabProject> resolveProject(ProjectState projectState, GitRemote remote) {
+    public Optional<GitlabProject> resolveProject(ProjectState projectState, GitRemote remote, GitRepository repository) {
         String remoteProjectName = remote.getName();
         String remoteUrl = remote.getFirstUrl();
 
         try {
-            Collection<GitlabProject> projects = settingsState.api().getProjects();
+            Collection<GitlabProject> projects = settingsState.api(repository).getProjects();
             for (GitlabProject gitlabProject : projects) {
                 if (gitlabProject.getName().toLowerCase().equals(remoteProjectName.toLowerCase()) || urlMatch(remoteUrl, gitlabProject.getSshUrl()) || urlMatch(remoteUrl, gitlabProject.getHttpUrl())) {
                     Integer projectId = gitlabProject.getId();

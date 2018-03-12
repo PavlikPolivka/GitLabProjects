@@ -9,6 +9,7 @@ import com.intellij.openapi.vcs.VcsNotifier;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ThrowableConvertor;
 import com.intellij.util.containers.Convertor;
+import com.ppolivka.gitlabprojects.api.dto.ServerDto;
 import com.ppolivka.gitlabprojects.util.GitLabUtil;
 import com.ppolivka.gitlabprojects.configuration.ProjectState;
 import com.ppolivka.gitlabprojects.configuration.SettingsState;
@@ -86,19 +87,19 @@ public class GitLabCreateMergeRequestWorker implements GitLabMergeRequestWorker 
                 indicator.setText("Creating merge request...");
                 GitlabMergeRequest mergeRequest;
                 try {
-                    mergeRequest = settingsState.api().createMergeRequest(gitlabProject, assignee, gitLocalBranch.getName(), branch.getName(), title, description, removeSourceBranch);
+                    mergeRequest = settingsState.api(gitRepository).createMergeRequest(gitlabProject, assignee, gitLocalBranch.getName(), branch.getName(), title, description, removeSourceBranch);
                 } catch (IOException e) {
                     showErrorDialog(project, "Cannot create Merge Request via GitLab REST API", CANNOT_CREATE_MERGE_REQUEST);
                     return;
                 }
                 VcsNotifier.getInstance(project)
-                        .notifyImportantInfo(title, "<a href='" + generateMergeRequestUrl(mergeRequest) + "'>Merge request '" + title + "' created</a>", NotificationListener.URL_OPENING_LISTENER);
+                        .notifyImportantInfo(title, "<a href='" + generateMergeRequestUrl(settingsState.currentGitlabServer(gitRepository), mergeRequest) + "'>Merge request '" + title + "' created</a>", NotificationListener.URL_OPENING_LISTENER);
             }
         }.queue();
     }
 
-    private String generateMergeRequestUrl(GitlabMergeRequest mergeRequest) {
-        final String hostText = settingsState.getHost();
+    private String generateMergeRequestUrl(ServerDto serverDto, GitlabMergeRequest mergeRequest) {
+        final String hostText = serverDto.getHost();
         StringBuilder helpUrl = new StringBuilder();
         helpUrl.append(hostText);
         if (!hostText.endsWith("/")) {
@@ -181,7 +182,7 @@ public class GitLabCreateMergeRequestWorker implements GitLabMergeRequestWorker 
                 String lastMergedBranch = mergeRequestWorker.getProjectState().getLastMergedBranch();
 
                 try {
-                    List<GitlabBranch> branches = settingsState.api().loadProjectBranches(mergeRequestWorker.getGitlabProject());
+                    List<GitlabBranch> branches = settingsState.api(project, file).loadProjectBranches(mergeRequestWorker.getGitlabProject());
                     List<BranchInfo> branchInfos = new ArrayList<>();
                     for (GitlabBranch branch : branches) {
                         BranchInfo branchInfo = new BranchInfo(branch.getName(), mergeRequestWorker.getRemoteProjectName());
@@ -197,7 +198,7 @@ public class GitLabCreateMergeRequestWorker implements GitLabMergeRequestWorker 
                 }
 
                 mergeRequestWorker.setLocalBranchInfo(new BranchInfo(mergeRequestWorker.getGitLocalBranch().getName(), mergeRequestWorker.getRemoteProjectName(), false));
-                mergeRequestWorker.setSearchableUsers(new SearchableUsers(project, mergeRequestWorker.getGitlabProject()));
+                mergeRequestWorker.setSearchableUsers(new SearchableUsers(project, file, mergeRequestWorker.getGitlabProject()));
                 //endregion
 
                 return mergeRequestWorker;
