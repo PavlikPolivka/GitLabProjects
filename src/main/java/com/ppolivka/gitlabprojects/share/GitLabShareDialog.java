@@ -58,7 +58,7 @@ public class GitLabShareDialog extends DialogWrapper {
         setTitle("Share on GitLab");
         setOKButtonText("Share");
 
-        ArrayList<ServerDto> servers = new ArrayList<>(settingsState.getServers());
+        ArrayList<ServerDto> servers = new ArrayList<>(settingsState.getAllServers());
         CollectionComboBoxModel collectionComboBoxModel = new CollectionComboBoxModel(servers, servers.get(0));
         serverList.setModel(collectionComboBoxModel);
 
