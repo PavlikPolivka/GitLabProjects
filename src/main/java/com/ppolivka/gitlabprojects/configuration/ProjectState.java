@@ -5,6 +5,9 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Project specific setting
  *
@@ -37,18 +40,24 @@ public class ProjectState implements PersistentStateComponent<ProjectState.State
     }
 
     public static class State {
-        public Integer projectId;
         public String lastMergedBranch;
         public Boolean deleteMergedBranch;
         public Boolean mergeAsWorkInProgress;
+        public Map<Integer, Integer> projectIdMap = new HashMap();
     }
 
-    public Integer getProjectId() {
-        return projectState.projectId;
+    public Integer getProjectId(String gitRepository) {
+        if(projectState.projectIdMap != null) {
+            return projectState.projectIdMap.get(gitRepository.hashCode());
+        }
+        return null;
     }
 
-    public void setProjectId(Integer projectId) {
-        projectState.projectId = projectId;
+    public void setProjectId(String gitRepository, Integer projectId) {
+        if(projectState.projectIdMap == null) {
+            projectState.projectIdMap = new HashMap<>();
+        }
+        projectState.projectIdMap.put(gitRepository.hashCode(), projectId);
     }
 
     public String getLastMergedBranch() {

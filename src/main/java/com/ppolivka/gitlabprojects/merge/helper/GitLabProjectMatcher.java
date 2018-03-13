@@ -19,17 +19,25 @@ public class GitLabProjectMatcher {
         String remoteProjectName = remote.getName();
         String remoteUrl = remote.getFirstUrl();
 
-        try {
-            Collection<GitlabProject> projects = settingsState.api(repository).getProjects();
-            for (GitlabProject gitlabProject : projects) {
-                if (gitlabProject.getName().toLowerCase().equals(remoteProjectName.toLowerCase()) || urlMatch(remoteUrl, gitlabProject.getSshUrl()) || urlMatch(remoteUrl, gitlabProject.getHttpUrl())) {
-                    Integer projectId = gitlabProject.getId();
-                    projectState.setProjectId(projectId);
-                    return Optional.of(gitlabProject);
+        if(projectState.getProjectId(remoteUrl) == null) {
+            try {
+                Collection<GitlabProject> projects = settingsState.api(repository).getProjects();
+                for (GitlabProject gitlabProject : projects) {
+                    if (gitlabProject.getName().toLowerCase().equals(remoteProjectName.toLowerCase()) || urlMatch(remoteUrl, gitlabProject.getSshUrl()) || urlMatch(remoteUrl, gitlabProject.getHttpUrl())) {
+                        Integer projectId = gitlabProject.getId();
+                        projectState.setProjectId(remoteUrl, projectId);
+                        return Optional.of(gitlabProject);
+                    }
                 }
+            } catch (Throwable throwable) {
+                throw new GitLabException("Cannot match project.", throwable);
             }
-        } catch (Throwable throwable) {
-            throw new GitLabException("Cannot match project.", throwable);
+        } else {
+            try {
+                return Optional.of(settingsState.api(repository).getProject(projectState.getProjectId(remoteUrl)));
+            } catch (Exception e) {
+                projectState.setProjectId(remoteUrl, null);
+            }
         }
 
         return Optional.empty();
