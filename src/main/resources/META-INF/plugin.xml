@@ -2,7 +2,7 @@
     <id>com.ppolivka.gitlabprojects</id>
     <name>GitLab Projects</name>
     <version>1.5.2</version>
-    <vendor email="polivka.pavel@gmail.com" url="http://ppolivka.com">Pavel Polivka</vendor>
+    <vendor email="polivka.pavel@gmail.com" url="https://www.ppolivka.com">Pavel Polivka</vendor>
 
     <description><![CDATA[
         <h2>GitLab Projects Plugin</h2>
