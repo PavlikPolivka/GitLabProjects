@@ -4,6 +4,7 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.ppolivka.gitlabprojects.configuration.SettingsState;
 import git4idea.actions.BasicAction;
 import git4idea.checkout.GitCheckoutProvider;
 import git4idea.checkout.GitCloneDialog;
@@ -13,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 
+import static com.ppolivka.gitlabprojects.util.MessageUtil.showInfoMessage;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 
@@ -25,6 +27,8 @@ import static org.apache.commons.lang.StringUtils.isNotBlank;
 public class GitLabCheckoutProvider extends GitCheckoutProvider {
 
     private Git myGit;
+    private SettingsState settingsState = SettingsState.getInstance();
+
 
     public GitLabCheckoutProvider() {
         super(ServiceManager.getService(Git.class));
@@ -33,10 +37,18 @@ public class GitLabCheckoutProvider extends GitCheckoutProvider {
 
     @Override
     public void doCheckout(final Project project, final Listener listener) {
-        GitLabCheckoutDialog gitLabCheckoutDialog = new GitLabCheckoutDialog(project);
-        gitLabCheckoutDialog.show();
-        if(gitLabCheckoutDialog.isOK() && isNotBlank(gitLabCheckoutDialog.getLastUsedUrl())) {
-            showGitCheckoutDialog(project, listener, gitLabCheckoutDialog.getLastUsedUrl());
+        if(settingsState.getAllServers().size() == 0) {
+            showInfoMessage(
+                    project,
+                    "No Gitlab Servers are configured. Please add your server in settings.",
+                    "No Gitlab Servers"
+            );
+        } else {
+            GitLabCheckoutDialog gitLabCheckoutDialog = new GitLabCheckoutDialog(project);
+            gitLabCheckoutDialog.show();
+            if (gitLabCheckoutDialog.isOK() && isNotBlank(gitLabCheckoutDialog.getLastUsedUrl())) {
+                showGitCheckoutDialog(project, listener, gitLabCheckoutDialog.getLastUsedUrl());
+            }
         }
     }
 
