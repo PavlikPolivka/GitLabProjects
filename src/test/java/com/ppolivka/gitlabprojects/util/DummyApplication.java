@@ -108,7 +108,17 @@ public class DummyApplication implements Application {
   }
 
   @Override
+  public void saveAll(boolean isForce) {
+
+  }
+
+  @Override
   public void saveSettings() {
+
+  }
+
+  @Override
+  public void saveSettings(boolean isForce) {
 
   }
 
@@ -160,6 +170,11 @@ public class DummyApplication implements Application {
 
   @Override
   public void invokeAndWait(@NotNull Runnable runnable, @NotNull ModalityState modalityState) throws ProcessCanceledException {
+
+  }
+
+  @Override
+  public void invokeAndWait(@NotNull Runnable runnable) throws ProcessCanceledException {
 
   }
 

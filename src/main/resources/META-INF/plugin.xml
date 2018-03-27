@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.ppolivka.gitlabprojects</id>
     <name>GitLab Projects</name>
-    <version>1.5.3</version>
+    <version>1.6.0</version>
     <vendor email="polivka.pavel@gmail.com" url="https://www.ppolivka.com">Pavel Polivka</vendor>
 
     <description><![CDATA[
@@ -17,11 +17,13 @@
     ]]></description>
 
     <change-notes><![CDATA[
-        Better error messaging during checkout.
+        Support for 2018.1 version of IDE. <br>
+        Checkout dialog removed and new Repository Hosting service added. <br>
+        <b> To checkout Gitlab projects please just use the Git checkout dialog. </b>
     ]]>
     </change-notes>
 
-    <idea-version since-build="144"/>
+    <idea-version since-build="181"/>
 
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.vcs</depends>
@@ -38,8 +40,10 @@
         <projectService serviceInterface="com.ppolivka.gitlabprojects.configuration.ProjectState"
                         serviceImplementation="com.ppolivka.gitlabprojects.configuration.ProjectState"/>
 
-        <checkoutProvider implementation="com.ppolivka.gitlabprojects.checkout.GitLabCheckoutProvider" id="GitLabProjectList" order="FIRST" />
+    </extensions>
 
+    <extensions defaultExtensionNs="Git4Idea">
+        <gitRepositoryHostingService implementation="com.ppolivka.gitlabprojects.checkout.GitLabRepositoryHostingService"/>
     </extensions>
 
     <application-components>

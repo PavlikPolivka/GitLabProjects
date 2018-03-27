@@ -5,15 +5,14 @@ import com.intellij.openapi.progress.EmptyProgressIndicator;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Couple;
-import com.intellij.openapi.util.ThrowableComputable;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.util.ThrowableConvertor;
-import com.ppolivka.gitlabprojects.util.GitLabUtil;
 import com.ppolivka.gitlabprojects.common.MasterFutureTask;
 import com.ppolivka.gitlabprojects.common.SlaveFutureTask;
 import com.ppolivka.gitlabprojects.merge.info.BranchInfo;
 import com.ppolivka.gitlabprojects.merge.info.DiffInfo;
+import com.ppolivka.gitlabprojects.util.GitLabUtil;
 import git4idea.GitCommit;
 import git4idea.changes.GitChangeUtils;
 import git4idea.history.GitHistoryUtils;
@@ -59,12 +58,7 @@ public class GitLabDiffViewWorker {
                     .computeValueInModal(project, "Collecting diff data...", new ThrowableConvertor<ProgressIndicator, DiffInfo, IOException>() {
                         @Override
                         public DiffInfo convert(ProgressIndicator indicator) throws IOException {
-                            return GitLabUtil.runInterruptable(indicator, new ThrowableComputable<DiffInfo, IOException>() {
-                                @Override
-                                public DiffInfo compute() throws IOException {
-                                    return getDiffInfo(from, branch);
-                                }
-                            });
+                            return GitLabUtil.runInterruptable(indicator, () -> getDiffInfo(from, branch));
                         }
                     });
         } catch (IOException e) {

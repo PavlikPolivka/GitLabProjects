@@ -33,7 +33,7 @@ import static com.ppolivka.gitlabprojects.util.GitLabUtil.isGitLabUrl;
 @State(
         name = "SettingsState",
         storages = {
-                @Storage(id = "default", file = "$APP_CONFIG$/gitlab-project-settings.xml")
+                @Storage("$APP_CONFIG$/gitlab-project-settings.xml")
         }
 )
 public class SettingsState implements PersistentStateComponent<SettingsState> {
@@ -72,10 +72,20 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
         apiFacade.getSession();
     }
 
+    public void reloadProjects(Collection<ServerDto> serverDtos) throws Throwable {
+        setProjects(new ArrayList<>());
+        for(ServerDto serverDto : serverDtos) {
+            reloadProjects(serverDto);
+        }
+    }
+
     public void reloadProjects(ServerDto serverDto) throws Throwable {
         ApiFacade apiFacade = api(serverDto);
 
-        Collection<ProjectDto> projects = new ArrayList<>();
+        Collection<ProjectDto> projects = getProjects();
+        if(projects == null) {
+            projects = new ArrayList<>();
+        }
 
             for (GitlabProject gitlabProject : apiFacade.getProjects()) {
                 ProjectDto projectDto = new ProjectDto();
@@ -188,6 +198,10 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
             }
         }
         return null;
+    }
+
+    public boolean isEnabled() {
+        return getAllServers() != null && getAllServers().size() > 0;
     }
 
     //endregion
