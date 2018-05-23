@@ -110,7 +110,7 @@ public class GitLabShareAction extends NoGitLabApiAction {
                 GitlabProject gitlabProject;
                 try {
                     indicator.setText("Creating GitLab Repository");
-                    gitlabProject = settingsState.api((ServerDto) gitLabShareDialog.getServerList().getSelectedItem()).createProject(name, visibility, publicity, namespace, "");
+                    gitlabProject = settingsState.api((ServerDto) gitLabShareDialog.getServerList().getSelectedItem()).createProject(name, ""+visibility, publicity, namespace, "");
                 } catch (IOException e) {
                     return;
                 }

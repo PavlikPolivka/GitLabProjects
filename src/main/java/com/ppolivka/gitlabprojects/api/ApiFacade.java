@@ -91,7 +91,7 @@ public class ApiFacade {
         api.updateMergeRequest(project.getId(), mergeRequest.getId(), null, user.getId(), null, null, null, null);
     }
 
-    public GitlabProject createProject(String name, int visibilityLevel, boolean isPublic, NamespaceDto namespace, String description) throws IOException {
+    public GitlabProject createProject(String name, String visibilityLevel, boolean isPublic, NamespaceDto namespace, String description) throws IOException {
         return api.createProject(
                 name,
                 namespace != null && namespace.getId() != 0 ? namespace.getId() : null,
