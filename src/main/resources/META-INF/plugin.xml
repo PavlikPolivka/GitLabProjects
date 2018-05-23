@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.ppolivka.gitlabprojects</id>
     <name>GitLab Projects</name>
-    <version>1.6.0</version>
+    <version>1.6.1</version>
     <vendor email="polivka.pavel@gmail.com" url="https://www.ppolivka.com">Pavel Polivka</vendor>
 
     <description><![CDATA[
@@ -17,13 +17,12 @@
     ]]></description>
 
     <change-notes><![CDATA[
-        Support for 2018.1 version of IDE. <br>
-        Checkout dialog removed and new Repository Hosting service added. <br>
-        <b> To checkout Gitlab projects please just use the Git checkout dialog. </b>
+        Support for 2018.2 version of IDE. <br>
+        Changed to new icons. <br>
     ]]>
     </change-notes>
 
-    <idea-version since-build="181"/>
+    <idea-version since-build="182"/>
 
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.vcs</depends>

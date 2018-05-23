@@ -3,7 +3,7 @@ plugins {
 }
 
 intellij {
-    version 'IC-2018.1'
+    version 'LATEST-EAP-SNAPSHOT'
     updateSinceUntilBuild false
     plugins 'git4idea'
     pluginName 'GitLabProjects'
