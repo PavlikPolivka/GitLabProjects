@@ -85,16 +85,16 @@ public class GitLabShareAction extends NoGitLabApiAction {
         final String name = gitLabShareDialog.getProjectName().getText();
         final String commitMessage = gitLabShareDialog.getCommitMessage().getText();
         final NamespaceDto namespace = (NamespaceDto) gitLabShareDialog.getGroupList().getSelectedItem();
-        int visibility_level = 10;
+        String visibility_level = "internal";
         boolean isPublic = false;
         if (gitLabShareDialog.getIsPrivate().isSelected()) {
-            visibility_level = 0;
+            visibility_level = "private";
         }
         if (gitLabShareDialog.getIsPublic().isSelected()) {
-            visibility_level = 20;
+            visibility_level = "public";
             isPublic = true;
         }
-        final int visibility = visibility_level;
+        final String visibility = visibility_level;
         final boolean publicity = isPublic;
 
         boolean isSsh = true;
@@ -110,7 +110,9 @@ public class GitLabShareAction extends NoGitLabApiAction {
                 GitlabProject gitlabProject;
                 try {
                     indicator.setText("Creating GitLab Repository");
-                    gitlabProject = settingsState.api((ServerDto) gitLabShareDialog.getServerList().getSelectedItem()).createProject(name, ""+visibility, publicity, namespace, "");
+                    gitlabProject = settingsState
+                            .api((ServerDto) gitLabShareDialog.getServerList().getSelectedItem())
+                            .createProject(name, visibility, publicity, namespace, "");
                 } catch (IOException e) {
                     return;
                 }

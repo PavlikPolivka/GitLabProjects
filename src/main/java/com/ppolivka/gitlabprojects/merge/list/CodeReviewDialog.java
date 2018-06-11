@@ -37,7 +37,6 @@ public class CodeReviewDialog extends DialogWrapper {
 
     private JPanel panel;
     private JButton diffButton;
-    private JCheckBox removeSourceBranchCheckBox;
     private JLabel sourceName;
     private JLabel targetName;
     private JLabel requestName;
@@ -74,8 +73,6 @@ public class CodeReviewDialog extends DialogWrapper {
         targetBranch = createBranchInfo(mergeRequest.getTargetBranch());
 
         requestName.setText(mergeRequest.getTitle());
-
-        removeSourceBranchCheckBox.setSelected(settingsState.isDefaultRemoveBranch());
 
         String assignee = "";
         if (mergeRequest.getAssignee() != null) {
@@ -126,7 +123,7 @@ public class CodeReviewDialog extends DialogWrapper {
                     .showYesNoDialog(project, "Merging Without Review", "You are about to merge this merge request without looking at code differences. Are you sure?");
         }
         if (canContinue) {
-            mergeRequestWorker.mergeBranches(project, mergeRequest, removeSourceBranchCheckBox.isSelected());
+            mergeRequestWorker.mergeBranches(project, mergeRequest);
             super.doOKAction();
         }
     }

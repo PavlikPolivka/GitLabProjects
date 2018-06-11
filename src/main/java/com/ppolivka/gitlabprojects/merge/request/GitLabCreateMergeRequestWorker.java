@@ -182,7 +182,9 @@ public class GitLabCreateMergeRequestWorker implements GitLabMergeRequestWorker 
                 String lastMergedBranch = mergeRequestWorker.getProjectState().getLastMergedBranch();
 
                 try {
-                    List<GitlabBranch> branches = settingsState.api(project, file).loadProjectBranches(mergeRequestWorker.getGitlabProject());
+                    List<GitlabBranch> branches = settingsState
+                            .api(project, file)
+                            .loadProjectBranches(mergeRequestWorker.getGitlabProject());
                     List<BranchInfo> branchInfos = new ArrayList<>();
                     for (GitlabBranch branch : branches) {
                         BranchInfo branchInfo = new BranchInfo(branch.getName(), mergeRequestWorker.getRemoteProjectName());

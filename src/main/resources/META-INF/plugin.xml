@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.ppolivka.gitlabprojects</id>
     <name>GitLab Projects</name>
-    <version>1.6.1</version>
+    <version>1.7.0</version>
     <vendor email="polivka.pavel@gmail.com" url="https://www.ppolivka.com">Pavel Polivka</vendor>
 
     <description><![CDATA[
@@ -17,12 +17,12 @@
     ]]></description>
 
     <change-notes><![CDATA[
-        Support for 2018.2 version of IDE. <br>
-        Changed to new icons. <br>
+        <b>Support for new GitLab API changes.</b> This is kind of a big change, please report any possible issues. <br>
+        Backported support for 2018.1 version of IDEs, still uses the new version of icons. <br>
     ]]>
     </change-notes>
 
-    <idea-version since-build="182"/>
+    <idea-version since-build="181"/>
 
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.vcs</depends>

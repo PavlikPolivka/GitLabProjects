@@ -80,15 +80,12 @@ public class ApiFacade {
         return requestor.to(tailUrl, GitlabMergeRequest.class);
     }
 
-    public void acceptMergeRequest(GitlabProject project, GitlabMergeRequest mergeRequest, boolean removeSourceBranch) throws IOException {
-        String tailUrl = "/projects/" + project.getId() + "/merge_request/" + mergeRequest.getId() + "/merge";
-        GitlabHTTPRequestor requestor = api.retrieve().method("PUT");
-        requestor.with("should_remove_source_branch", removeSourceBranch);
-        requestor.to(tailUrl, mergeRequest);
+    public void acceptMergeRequest(GitlabProject project, GitlabMergeRequest mergeRequest) throws IOException {
+        api.acceptMergeRequest(project, mergeRequest.getIid(), null);
     }
 
     public void changeAssignee(GitlabProject project, GitlabMergeRequest mergeRequest, GitlabUser user) throws IOException {
-        api.updateMergeRequest(project.getId(), mergeRequest.getId(), null, user.getId(), null, null, null, null);
+        api.updateMergeRequest(project.getId(), mergeRequest.getIid(), null, user.getId(), null, null, null, null);
     }
 
     public GitlabProject createProject(String name, String visibilityLevel, boolean isPublic, NamespaceDto namespace, String description) throws IOException {
@@ -133,7 +130,7 @@ public class ApiFacade {
 
         List<GitlabProject> projects;
         try {
-            projects = api.getProjects();
+            projects = api.getMembershipProjects();
         } catch (Throwable e) {
             projects = Collections.emptyList();
         }

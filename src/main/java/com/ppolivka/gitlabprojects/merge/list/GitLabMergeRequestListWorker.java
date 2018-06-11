@@ -48,12 +48,12 @@ public class GitLabMergeRequestListWorker implements GitLabMergeRequestWorker {
 
     private List<GitlabMergeRequest> mergeRequests;
 
-    public void mergeBranches(final Project project, final GitlabMergeRequest mergeRequest, final boolean removeSource) {
+    public void mergeBranches(final Project project, final GitlabMergeRequest mergeRequest) {
         new Task.Backgroundable(project, "Merging Branches...") {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 try {
-                    settingsState.api(gitRepository).acceptMergeRequest(gitlabProject, mergeRequest, removeSource);
+                    settingsState.api(gitRepository).acceptMergeRequest(gitlabProject, mergeRequest);
                     VcsNotifier.getInstance(project)
                             .notifyImportantInfo("Merged", "Merge request is merged.", NotificationListener.URL_OPENING_LISTENER);
                 } catch (IOException e) {
