@@ -1,7 +1,5 @@
 package com.ppolivka.gitlabprojects.merge.info;
 
-import com.ppolivka.gitlabprojects.common.MasterFutureTask;
-import com.ppolivka.gitlabprojects.common.SlaveFutureTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -14,16 +12,8 @@ import java.util.Objects;
  */
 public class BranchInfo {
 
-    @NotNull
-    public final Object LOCK = new Object();
-    @NotNull
-    public final Object LOCK_FETCH = new Object();
-
     private String name;
     private String remoteName;
-    private MasterFutureTask<Void> fetchTask;
-    private SlaveFutureTask<DiffInfo> diffInfoTask;
-
     private boolean remoteOnly = false;
 
     public BranchInfo(String name, String remoteName) {
@@ -58,22 +48,6 @@ public class BranchInfo {
 
     public void setRemoteName(String remoteName) {
         this.remoteName = remoteName;
-    }
-
-    public SlaveFutureTask<DiffInfo> getDiffInfoTask() {
-        return diffInfoTask;
-    }
-
-    public void setDiffInfoTask(@NotNull SlaveFutureTask<DiffInfo> diffInfoTask) {
-        this.diffInfoTask = diffInfoTask;
-    }
-
-    public MasterFutureTask<Void> getFetchTask() {
-        return fetchTask;
-    }
-
-    public void setFetchTask(MasterFutureTask<Void> fetchTask) {
-        this.fetchTask = fetchTask;
     }
 
     @Override
