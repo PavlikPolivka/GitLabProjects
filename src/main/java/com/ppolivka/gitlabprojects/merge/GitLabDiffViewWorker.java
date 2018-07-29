@@ -18,7 +18,6 @@ import git4idea.ui.branch.GitCompareBranchesDialog;
 import git4idea.update.GitFetchResult;
 import git4idea.update.GitFetcher;
 import git4idea.util.GitCommitCompareInfo;
-import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.ide.PooledThreadExecutor;
@@ -85,9 +84,9 @@ public class GitLabDiffViewWorker {
         } catch (InterruptedException e) {
             throw new IOException(e);
         } catch (ExecutionException e) {
-            Throwable ex = e.getCause();
-            if (ex instanceof VcsException) {
-                throw new IOException(ex);
+            Throwable wrapEx = e.getCause();
+            if (wrapEx.getCause() instanceof VcsException) {
+                throw new IOException(wrapEx.getCause());
             }
             return null;
         }
@@ -99,7 +98,13 @@ public class GitLabDiffViewWorker {
         }
 
         CompletableFuture<Boolean> fetchFuture = launchFetchRemote(branch);
-        return fetchFuture.thenApply(t -> doLoadDiffInfo(from, branch));
+        return fetchFuture.thenApply(t -> {
+            try {
+                return doLoadDiffInfo(from, branch);
+            } catch (VcsException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     private CompletableFuture<Boolean> launchFetchRemote(@NotNull final BranchInfo branch) {
@@ -125,8 +130,7 @@ public class GitLabDiffViewWorker {
     }
 
     @NotNull
-    @SneakyThrows(VcsException.class)
-    private DiffInfo doLoadDiffInfo(@NotNull final BranchInfo from, @NotNull final BranchInfo to) {
+    private DiffInfo doLoadDiffInfo(@NotNull final BranchInfo from, @NotNull final BranchInfo to) throws VcsException {
         String currentBranch = from.getFullName();
         String targetBranch = to.getFullRemoteName();
 
