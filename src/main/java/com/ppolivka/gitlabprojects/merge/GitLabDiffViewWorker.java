@@ -1,5 +1,6 @@
 package com.ppolivka.gitlabprojects.merge;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.EmptyProgressIndicator;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
@@ -7,6 +8,8 @@ import com.intellij.openapi.util.Couple;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.util.ThrowableConvertor;
+import com.ppolivka.gitlabprojects.common.MasterFutureTask;
+import com.ppolivka.gitlabprojects.common.SlaveFutureTask;
 import com.ppolivka.gitlabprojects.merge.info.BranchInfo;
 import com.ppolivka.gitlabprojects.merge.info.DiffInfo;
 import com.ppolivka.gitlabprojects.util.GitLabUtil;
@@ -18,15 +21,13 @@ import git4idea.ui.branch.GitCompareBranchesDialog;
 import git4idea.update.GitFetchResult;
 import git4idea.update.GitFetcher;
 import git4idea.util.GitCommitCompareInfo;
-import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.ide.PooledThreadExecutor;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
 import static com.ppolivka.gitlabprojects.util.MessageUtil.showErrorDialog;
@@ -39,15 +40,15 @@ import static com.ppolivka.gitlabprojects.util.MessageUtil.showErrorDialog;
  */
 public class GitLabDiffViewWorker {
 
-    private Project project;
-    private GitRepository gitRepository;
+    Project project;
+    GitRepository gitRepository;
 
-    GitLabDiffViewWorker(Project project, GitRepository gitRepository) {
+    public GitLabDiffViewWorker(Project project, GitRepository gitRepository) {
         this.project = project;
         this.gitRepository = gitRepository;
     }
 
-    private static String CANNOT_SHOW_DIFF_INFO = "Cannot Show Diff Info";
+    public static String CANNOT_SHOW_DIFF_INFO = "Cannot Show Diff Info";
 
 
     public void showDiffDialog(@NotNull final BranchInfo from, @NotNull final BranchInfo branch) {
@@ -80,8 +81,11 @@ public class GitLabDiffViewWorker {
             return null;
         }
 
+        launchLoadDiffInfo(from, branch);
+
+        assert branch.getDiffInfoTask() != null;
         try {
-            return launchLoadDiffInfo(from, branch).get();
+            return branch.getDiffInfoTask().get();
         } catch (InterruptedException e) {
             throw new IOException(e);
         } catch (ExecutionException e) {
@@ -93,21 +97,69 @@ public class GitLabDiffViewWorker {
         }
     }
 
-    public CompletableFuture<DiffInfo> launchLoadDiffInfo(@NotNull final BranchInfo from, @NotNull final BranchInfo branch) {
+    public void launchLoadDiffInfo(@NotNull final BranchInfo from, @NotNull final BranchInfo branch) {
         if (branch.getName() == null) {
-            return CompletableFuture.completedFuture(null);
+            return;
         }
 
-        CompletableFuture<Boolean> fetchFuture = launchFetchRemote(branch);
-        return fetchFuture.thenApply(t -> doLoadDiffInfo(from, branch));
+        if (branch.getDiffInfoTask() != null) {
+            return;
+        }
+        synchronized (branch.LOCK) {
+            if (branch.getDiffInfoTask() != null) {
+                return;
+            }
+
+            launchFetchRemote(branch);
+            MasterFutureTask<Void> masterTask = branch.getFetchTask();
+            assert masterTask != null;
+
+            final SlaveFutureTask<DiffInfo> task = new SlaveFutureTask<>(masterTask, new Callable<DiffInfo>() {
+                @Override
+                public DiffInfo call() throws VcsException {
+                    return doLoadDiffInfo(from, branch);
+                }
+            });
+            branch.setDiffInfoTask(task);
+
+            ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
+                @Override
+                public void run() {
+                    task.run();
+                }
+            });
+        }
     }
 
-    private CompletableFuture<Boolean> launchFetchRemote(@NotNull final BranchInfo branch) {
+    public void launchFetchRemote(@NotNull final BranchInfo branch) {
         if (branch.getName() == null) {
-            return CompletableFuture.completedFuture(false);
+            return;
         }
 
-        return CompletableFuture.supplyAsync(() -> doFetchRemote(branch), PooledThreadExecutor.INSTANCE);
+        if (branch.getFetchTask() != null) {
+            return;
+        }
+        synchronized (branch.LOCK_FETCH) {
+            if (branch.getFetchTask() != null) {
+                return;
+            }
+
+            final MasterFutureTask<Void> task = new MasterFutureTask<Void>(new Callable<Void>() {
+                @Override
+                public Void call() throws Exception {
+                    doFetchRemote(branch);
+                    return null;
+                }
+            });
+            branch.setFetchTask(task);
+
+            ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
+                @Override
+                public void run() {
+                    task.run();
+                }
+            });
+        }
     }
 
     private boolean doFetchRemote(@NotNull BranchInfo branch) {
@@ -125,8 +177,7 @@ public class GitLabDiffViewWorker {
     }
 
     @NotNull
-    @SneakyThrows(VcsException.class)
-    private DiffInfo doLoadDiffInfo(@NotNull final BranchInfo from, @NotNull final BranchInfo to) {
+    private DiffInfo doLoadDiffInfo(@NotNull final BranchInfo from, @NotNull final BranchInfo to) throws VcsException {
         String currentBranch = from.getFullName();
         String targetBranch = to.getFullRemoteName();
 
