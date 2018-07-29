@@ -1,5 +1,6 @@
 plugins {
     id "org.jetbrains.intellij" version "0.2.13"
+    id 'io.franzbecker.gradle-lombok' version '1.14'
 }
 
 intellij {
