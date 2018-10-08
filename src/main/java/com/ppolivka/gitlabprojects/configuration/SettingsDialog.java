@@ -34,12 +34,6 @@ public class SettingsDialog extends DialogWrapper {
 
     @Nullable
     @Override
-    protected ValidationInfo doValidate() {
-        return settingsView.doValidate(5000);
-    }
-
-    @Nullable
-    @Override
     protected JComponent createCenterPanel() {
         return settingsView.createComponent();
     }

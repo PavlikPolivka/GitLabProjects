@@ -17,6 +17,7 @@ import com.ppolivka.gitlabprojects.api.dto.ServerDto;
 import com.ppolivka.gitlabprojects.common.GitLabIcons;
 import com.ppolivka.gitlabprojects.common.NoGitLabApiAction;
 import com.ppolivka.gitlabprojects.configuration.SettingsState;
+import com.ppolivka.gitlabprojects.dto.GitlabServer;
 import com.ppolivka.gitlabprojects.util.GitLabUtil;
 import git4idea.GitLocalBranch;
 import git4idea.GitUtil;
@@ -111,7 +112,7 @@ public class GitLabShareAction extends NoGitLabApiAction {
                 try {
                     indicator.setText("Creating GitLab Repository");
                     gitlabProject = settingsState
-                            .api((ServerDto) gitLabShareDialog.getServerList().getSelectedItem())
+                            .api((GitlabServer) gitLabShareDialog.getServerList().getSelectedItem())
                             .createProject(name, visibility, publicity, namespace, "");
                 } catch (IOException e) {
                     return;

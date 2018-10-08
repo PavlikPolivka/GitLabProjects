@@ -10,6 +10,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ThrowableConvertor;
 import com.intellij.util.containers.Convertor;
 import com.ppolivka.gitlabprojects.api.dto.ServerDto;
+import com.ppolivka.gitlabprojects.dto.GitlabServer;
 import com.ppolivka.gitlabprojects.util.GitLabUtil;
 import com.ppolivka.gitlabprojects.configuration.ProjectState;
 import com.ppolivka.gitlabprojects.configuration.SettingsState;
@@ -98,8 +99,8 @@ public class GitLabCreateMergeRequestWorker implements GitLabMergeRequestWorker 
         }.queue();
     }
 
-    private String generateMergeRequestUrl(ServerDto serverDto, GitlabMergeRequest mergeRequest) {
-        final String hostText = serverDto.getHost();
+    private String generateMergeRequestUrl(GitlabServer server, GitlabMergeRequest mergeRequest) {
+        final String hostText = server.getApiUrl();
         StringBuilder helpUrl = new StringBuilder();
         helpUrl.append(hostText);
         if (!hostText.endsWith("/")) {

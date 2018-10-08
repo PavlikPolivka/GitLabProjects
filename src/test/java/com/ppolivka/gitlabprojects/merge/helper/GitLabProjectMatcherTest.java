@@ -7,6 +7,7 @@ import com.ppolivka.gitlabprojects.api.ApiFacade;
 import com.ppolivka.gitlabprojects.api.dto.ServerDto;
 import com.ppolivka.gitlabprojects.configuration.ProjectState;
 import com.ppolivka.gitlabprojects.configuration.SettingsState;
+import com.ppolivka.gitlabprojects.dto.GitlabServer;
 import com.ppolivka.gitlabprojects.util.DummyApplication;
 import com.ppolivka.gitlabprojects.util.DummyDisposable;
 import git4idea.repo.GitRemote;
@@ -120,7 +121,7 @@ public class GitLabProjectMatcherTest {
         }
 
         @Override
-        public ApiFacade api(ServerDto serverDto) {
+        public ApiFacade api(GitlabServer serverDto) {
             return apiFacade;
         }
 

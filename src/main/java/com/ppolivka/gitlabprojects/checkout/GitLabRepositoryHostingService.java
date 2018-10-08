@@ -7,15 +7,15 @@ import com.intellij.openapi.project.Project;
 import com.ppolivka.gitlabprojects.api.dto.ProjectDto;
 import com.ppolivka.gitlabprojects.configuration.SettingsDialog;
 import com.ppolivka.gitlabprojects.configuration.SettingsState;
+import com.ppolivka.gitlabprojects.dto.GitlabServer;
 import com.ppolivka.gitlabprojects.util.GitLabUtil;
 import git4idea.DialogManager;
 import git4idea.remote.GitRepositoryHostingService;
+import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class GitLabRepositoryHostingService extends GitRepositoryHostingService {
     @NotNull
@@ -50,15 +50,17 @@ public class GitLabRepositoryHostingService extends GitRepositoryHostingService 
                     List<String> repos = new ArrayList<>();
                     GitLabUtil.runInterruptable(progressIndicator, () -> {
                         try {
-                            settingsState.reloadProjects(settingsState.getAllServers());
-                            return settingsState.getProjects();
+                            return settingsState.loadMapOfServersAndProjects(settingsState.getGitlabServers());
                         } catch (Throwable throwable) {
                             throwable.printStackTrace();
                         }
-                        return new ArrayList<ProjectDto>();
-                    }).forEach(projectDto -> {
-                        repos.add(projectDto.getSshUrl());
-                        repos.add(projectDto.getHttpUrl());
+                        return new HashMap<GitlabServer, Collection<ProjectDto>>();
+                    }).forEach((server, projects) -> {
+                        if(GitlabServer.CheckoutType.SSH.equals(server.getPreferredConnection())) {
+                            projects.forEach(project -> repos.add(project.getSshUrl()));
+                        } else {
+                            projects.forEach(project -> repos.add(project.getHttpUrl()));
+                        }
                     });
                     return repos;
                 } catch (IOException e) {

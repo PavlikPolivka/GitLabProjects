@@ -1,5 +1,6 @@
 plugins {
     id "org.jetbrains.intellij" version "0.2.13"
+    id 'io.franzbecker.gradle-lombok' version '1.14'
 }
 
 intellij {
@@ -7,6 +8,11 @@ intellij {
     updateSinceUntilBuild false
     plugins 'git4idea'
     pluginName 'GitLabProjects'
+}
+
+lombok {
+    version = '1.18.2'
+    sha256 = ""
 }
 
 repositories {

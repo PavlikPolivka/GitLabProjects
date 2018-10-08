@@ -10,16 +10,17 @@ import com.intellij.util.xmlb.XmlSerializerUtil;
 import com.ppolivka.gitlabprojects.api.ApiFacade;
 import com.ppolivka.gitlabprojects.api.dto.ProjectDto;
 import com.ppolivka.gitlabprojects.api.dto.ServerDto;
+import com.ppolivka.gitlabprojects.dto.GitlabServer;
 import com.ppolivka.gitlabprojects.util.GitLabUtil;
 import git4idea.repo.GitRemote;
 import git4idea.repo.GitRepository;
+import lombok.SneakyThrows;
 import org.apache.commons.lang.StringUtils;
 import org.gitlab.api.models.GitlabProject;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 
 import static com.ppolivka.gitlabprojects.util.GitLabUtil.isGitLabUrl;
 
@@ -33,7 +34,7 @@ import static com.ppolivka.gitlabprojects.util.GitLabUtil.isGitLabUrl;
 @State(
         name = "SettingsState",
         storages = {
-                @Storage("$APP_CONFIG$/gitlab-project-settings.xml")
+                @Storage("$APP_CONFIG$/gitlab-project-settings-new-format.xml")
         }
 )
 public class SettingsState implements PersistentStateComponent<SettingsState> {
@@ -46,7 +47,7 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
 
     public Collection<ProjectDto> projects = new ArrayList<>();
 
-    public Collection<ServerDto> servers = new ArrayList<>();
+    public Collection<GitlabServer> gitlabServers = new ArrayList<>();
 
     public static SettingsState getInstance() {
         return ServiceManager.getService(SettingsState.class);
@@ -72,30 +73,46 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
         apiFacade.getSession();
     }
 
-    public void reloadProjects(Collection<ServerDto> serverDtos) throws Throwable {
+    public void reloadProjects(Collection<GitlabServer> servers) throws Throwable {
         setProjects(new ArrayList<>());
-        for(ServerDto serverDto : serverDtos) {
-            reloadProjects(serverDto);
+        for(GitlabServer server : servers) {
+            reloadProjects(server);
         }
     }
 
-    public void reloadProjects(ServerDto serverDto) throws Throwable {
-        ApiFacade apiFacade = api(serverDto);
+    @SneakyThrows
+    public Map<GitlabServer, Collection<ProjectDto>> loadMapOfServersAndProjects(Collection<GitlabServer> servers) {
+        Map<GitlabServer, Collection<ProjectDto>> map = new HashMap<>();
+        for(GitlabServer server : servers) {
+            Collection<ProjectDto> projects = loadProjects(server);
+            map.put(server, projects);
+        }
+        return map;
+    }
+
+    public void reloadProjects(GitlabServer server) throws Throwable {
+        this.setProjects(loadProjects(server));
+
+    }
+
+    public Collection<ProjectDto> loadProjects(GitlabServer server) throws Throwable {
+        ApiFacade apiFacade = api(server);
 
         Collection<ProjectDto> projects = getProjects();
         if(projects == null) {
             projects = new ArrayList<>();
         }
 
-            for (GitlabProject gitlabProject : apiFacade.getProjects()) {
-                ProjectDto projectDto = new ProjectDto();
-                projectDto.setName(gitlabProject.getName());
-                projectDto.setNamespace(gitlabProject.getNamespace().getName());
-                projectDto.setHttpUrl(gitlabProject.getHttpUrl());
-                projectDto.setSshUrl(gitlabProject.getSshUrl());
-                projects.add(projectDto);
-            }
+        for (GitlabProject gitlabProject : apiFacade.getProjects()) {
+            ProjectDto projectDto = new ProjectDto();
+            projectDto.setName(gitlabProject.getName());
+            projectDto.setNamespace(gitlabProject.getNamespace().getName());
+            projectDto.setHttpUrl(gitlabProject.getHttpUrl());
+            projectDto.setSshUrl(gitlabProject.getSshUrl());
+            projects.add(projectDto);
+        }
         this.setProjects(projects);
+        return projects;
 
     }
 
@@ -107,8 +124,8 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
         return api(currentGitlabServer(gitRepository));
     }
 
-    public ApiFacade api(ServerDto serverDto) {
-        return new ApiFacade(serverDto.getHost(), serverDto.getToken());
+    public ApiFacade api(GitlabServer serverDto) {
+        return new ApiFacade(serverDto.getApiUrl(), serverDto.getApiToken());
     }
 
     //region Getters & Setters
@@ -145,63 +162,50 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
         this.projects = projects;
     }
 
-    public Collection<ServerDto> getServers() {
-        return servers;
+    public Collection<GitlabServer> getGitlabServers() {
+        return gitlabServers;
     }
 
-    public void setServers(Collection<ServerDto> servers) {
-        this.servers = servers;
+    public void setGitlabServers(Collection<GitlabServer> gitlabServers) {
+        this.gitlabServers = gitlabServers;
     }
 
-    public Collection<ServerDto> getAllServers() {
-        Collection<ServerDto> allServers = new ArrayList<>(getServers());
-        if(StringUtils.isNotBlank(host) && StringUtils.isNotBlank(token)) {
-            ServerDto serverDto = new ServerDto();
-            serverDto.setHost(host);
-            serverDto.setToken(token);
-            serverDto.setDefaultRemoveBranch(defaultRemoveBranch);
-            allServers.add(serverDto);
-        }
-
-        return allServers;
-    }
-
-    public void addServer(ServerDto serverDto) {
-        if(getServers().stream().noneMatch(serverDto1 -> serverDto.getHost().equals(serverDto1.getHost()))) {
-            getServers().add(serverDto);
+    public void addServer(GitlabServer server) {
+        if(getGitlabServers().stream().noneMatch(server1 -> server.getApiUrl().equals(server1.getApiUrl()))) {
+            getGitlabServers().add(server);
         } else {
-            getServers().stream().filter(serverDto1 -> serverDto.getHost().equals(serverDto1.getHost())).forEach(server -> {
-                server.setHost(serverDto.getHost());
-                server.setToken(serverDto.getToken());
-                server.setDefaultRemoveBranch(serverDto.isDefaultRemoveBranch());
+            getGitlabServers().stream().filter(server1 -> server.getApiUrl().equals(server1.getApiUrl())).forEach(changedServer -> {
+                changedServer.setApiUrl(server.getApiUrl());
+                changedServer.setRepositoryUrl(server.getRepositoryUrl());
+                changedServer.setApiToken(server.getApiToken());
+                changedServer.setPreferredConnection(server.getPreferredConnection());
+                changedServer.setRemoveSourceBranch(server.isRemoveSourceBranch());
             });
         }
     }
 
-    public void deleteServer(ServerDto serverDto) {
-        getServers().stream().filter(server -> serverDto.getHost().equals(server.getHost())).forEach(server -> getServers().remove(server));
+    public void deleteServer(GitlabServer server) {
+        getGitlabServers().stream().filter(server1 -> server.getApiUrl().equals(server1.getApiUrl())).forEach(removedServer -> getGitlabServers().remove(removedServer));
     }
-    public ServerDto currentGitlabServer(Project project, VirtualFile file) {
+    public GitlabServer currentGitlabServer(Project project, VirtualFile file) {
         GitRepository gitRepository = GitLabUtil.getGitRepository(project, file);
         return currentGitlabServer(gitRepository);
     }
 
-    public ServerDto currentGitlabServer(GitRepository gitRepository) {
-        ;
+    public GitlabServer currentGitlabServer(GitRepository gitRepository) {
         for (GitRemote gitRemote : gitRepository.getRemotes()) {
             for (String remoteUrl : gitRemote.getUrls()) {
-                for(ServerDto server : getAllServers()) {
-                    if (isGitLabUrl(server.getHost(), remoteUrl)) {
+                for(GitlabServer server : getGitlabServers()) {
+                    if(remoteUrl.contains(server.getRepositoryUrl()))
                         return server;
                     }
                 }
             }
-        }
         return null;
     }
 
     public boolean isEnabled() {
-        return getAllServers() != null && getAllServers().size() > 0;
+        return getGitlabServers() != null && getGitlabServers().size() > 0;
     }
 
     //endregion

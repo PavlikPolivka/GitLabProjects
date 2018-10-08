@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.ppolivka.gitlabprojects</id>
     <name>GitLab Projects</name>
-    <version>1.7.0</version>
+    <version>2.0.0</version>
     <vendor email="polivka.pavel@gmail.com" url="https://www.ppolivka.com">Pavel Polivka</vendor>
 
     <description><![CDATA[
@@ -9,7 +9,7 @@
         <p>Simple plugin that is adding support for GitLab specific actions to JetBrain IDEs</p>
         <h3>Features:</h3>
         <ul>
-            <li><b>GitLab Checkout dialog</b> - list all users projects on GitLab and provides quick way to clone them locally</li>
+            <li><b>GitLab Checkout support</b> - add GitLab autocompleter to IDE Git checkout dialog</li>
             <li><b>GitLab Share dialog</b> - allows quick import of new projects to GitLab, user can specify namespace and project visibility</li>
             <li><b>GitLab Merge Request dialog</b> - user can quickly create new merge requests from current branch</li>
             <li><b>GitLab Merge Request List dialog</b> - user can list and accept all open code reviews</li>
@@ -17,8 +17,15 @@
     ]]></description>
 
     <change-notes><![CDATA[
-        <b>Support for new GitLab API changes.</b> This is kind of a big change, please report any possible issues. <br>
-        Backported support for 2018.1 version of IDEs, still uses the new version of icons. <br>
+        <b>New Settings Dialog</b> <br>
+        The setting dialog was mess so I finally redone it. Unfortunately due to data mess in the old dialog all the plugin settings will be lost with this update. It's impossible to migrate them. <br>
+        Now it's correctly listed under Version Control menu. <br>
+        The server list now has it's own add/edit dialog. <br>
+        Allows to set if default checkout method should be SSH or HTTP. <br>
+        <b>Checkout dialog</b>
+        The normal git checkout dialog will no list only repository urls from your preferred checkout method. Can be changed in settings dialog. <br>
+        <b>Other changes</b>
+        All the actions now correctly mark if they are opening dialogs. <br>
     ]]>
     </change-notes>
 
@@ -34,8 +41,8 @@
                             serviceImplementation="com.ppolivka.gitlabprojects.configuration.SettingsState"/>
 
         <!-- provider for the configurable instance ( configuration settings ) -->
-        <applicationConfigurable id="GitLabConfigurableProvider"
-                                 provider="com.ppolivka.gitlabprojects.configuration.SettingsConfigurableProvider"/>
+        <projectConfigurable id="GitLabConfigurableProvider"
+                                 provider="com.ppolivka.gitlabprojects.configuration.SettingsConfigurableProvider" parentId="project.propVCSSupport.Mappings" displayName="GitLab"/>
         <projectService serviceInterface="com.ppolivka.gitlabprojects.configuration.ProjectState"
                         serviceImplementation="com.ppolivka.gitlabprojects.configuration.ProjectState"/>
 

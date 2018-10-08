@@ -79,7 +79,7 @@ public class GitLabUtil {
     public static Pair<GitRemote, String> findGitLabRemote(@NotNull GitRepository repository) {
         for (GitRemote gitRemote : repository.getRemotes()) {
             for (String remoteUrl : gitRemote.getUrls()) {
-                if (isGitLabUrl(settingsState.currentGitlabServer(repository).getHost(), remoteUrl)) {
+                if (remoteUrl.contains(settingsState.currentGitlabServer(repository).getRepositoryUrl())) {
                   return Pair.create(gitRemote, gitRemote.getName());
                 }
             }

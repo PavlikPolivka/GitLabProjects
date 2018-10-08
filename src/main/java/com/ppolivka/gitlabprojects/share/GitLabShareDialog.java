@@ -10,6 +10,7 @@ import com.intellij.ui.CollectionComboBoxModel;
 import com.ppolivka.gitlabprojects.api.dto.NamespaceDto;
 import com.ppolivka.gitlabprojects.api.dto.ServerDto;
 import com.ppolivka.gitlabprojects.configuration.SettingsState;
+import com.ppolivka.gitlabprojects.dto.GitlabServer;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
@@ -58,7 +59,7 @@ public class GitLabShareDialog extends DialogWrapper {
         setTitle("Share on GitLab");
         setOKButtonText("Share");
 
-        ArrayList<ServerDto> servers = new ArrayList<>(settingsState.getAllServers());
+        ArrayList<GitlabServer> servers = new ArrayList<>(settingsState.getGitlabServers());
         CollectionComboBoxModel collectionComboBoxModel = new CollectionComboBoxModel(servers, servers.get(0));
         serverList.setModel(collectionComboBoxModel);
 
@@ -120,8 +121,7 @@ public class GitLabShareDialog extends DialogWrapper {
                         setId(0);
                         setPath("Default");
                     }});
-                    // TODO Server listing
-                    List<NamespaceDto> remoteNamespaces = settingsState.api((ServerDto) serverList.getSelectedItem()).getNamespaces();
+                    List<NamespaceDto> remoteNamespaces = settingsState.api((GitlabServer) serverList.getSelectedItem()).getNamespaces();
                     if(remoteNamespaces != null) {
                         namespaces.addAll(remoteNamespaces);
                     }

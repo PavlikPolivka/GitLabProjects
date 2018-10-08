@@ -43,7 +43,7 @@ public abstract class NoGitLabApiAction extends DumbAwareAction {
             return;
         }
 
-        if(settingsState.getAllServers().size() == 0) {
+        if(settingsState.getGitlabServers().size() == 0) {
             return;
         }
 
