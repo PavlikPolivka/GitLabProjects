@@ -22,9 +22,9 @@
         Now it's correctly listed under Version Control menu. <br>
         The server list now has it's own add/edit dialog. <br>
         Allows to set if default checkout method should be SSH or HTTP. <br>
-        <b>Checkout dialog</b>
+        <b>Checkout dialog</b> <br>
         The normal git checkout dialog will no list only repository urls from your preferred checkout method. Can be changed in settings dialog. <br>
-        <b>Other changes</b>
+        <b>Other changes</b> <br>
         All the actions now correctly mark if they are opening dialogs. <br>
     ]]>
     </change-notes>
