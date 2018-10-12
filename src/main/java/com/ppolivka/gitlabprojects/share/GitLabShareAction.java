@@ -51,7 +51,7 @@ public class GitLabShareAction extends NoGitLabApiAction {
     private static SettingsState settingsState = SettingsState.getInstance();
 
     public GitLabShareAction() {
-        super("Share on GitLab", "Easy share on your GitLab server", GitLabIcons.gitLabIcon);
+        super("Share on GitLab...", "Easy share on your GitLab server", GitLabIcons.gitLabIcon);
     }
 
     @Override
