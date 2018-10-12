@@ -15,7 +15,7 @@ import git4idea.DialogManager;
 public class GitLabMergeRequestAction extends GitLabApiAction {
 
     public GitLabMergeRequestAction() {
-        super("Create _Merge Request", "Creates merge request from current branch", AllIcons.Vcs.Merge);
+        super("Create _Merge Request...", "Creates merge request from current branch", AllIcons.Vcs.Merge);
     }
 
     @Override
