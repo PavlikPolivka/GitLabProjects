@@ -11,7 +11,6 @@ import com.ppolivka.gitlabprojects.dto.GitlabServer;
 import com.ppolivka.gitlabprojects.util.GitLabUtil;
 import git4idea.DialogManager;
 import git4idea.remote.GitRepositoryHostingService;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

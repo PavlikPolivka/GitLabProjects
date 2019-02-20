@@ -10,6 +10,7 @@ import org.gitlab.api.models.*;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Facade aroud GitLab REST API
@@ -134,6 +135,7 @@ public class ApiFacade {
         } catch (Throwable e) {
             projects = Collections.emptyList();
         }
+        projects = projects.stream().filter(project -> !Boolean.TRUE.equals(project.isArchived())).collect(Collectors.toList());
         result.addAll(projects);
 
         return result;
