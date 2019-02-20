@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.ppolivka.gitlabprojects</id>
     <name>GitLab Projects</name>
-    <version>2.0.0</version>
+    <version>2.0.1</version>
     <vendor email="polivka.pavel@gmail.com" url="https://www.ppolivka.com">Pavel Polivka</vendor>
 
     <description><![CDATA[
@@ -17,15 +17,10 @@
     ]]></description>
 
     <change-notes><![CDATA[
-        <b>New Settings Dialog</b> <br>
-        The setting dialog was mess so I finally redone it. Unfortunately due to data mess in the old dialog all the plugin settings will be lost with this update. It's impossible to migrate them. <br>
-        Now it's correctly listed under Version Control menu. <br>
-        The server list now has it's own add/edit dialog. <br>
-        Allows to set if default checkout method should be SSH or HTTP. <br>
-        <b>Checkout dialog</b> <br>
-        The normal git checkout dialog will no list only repository urls from your preferred checkout method. Can be changed in settings dialog. <br>
-        <b>Other changes</b> <br>
-        All the actions now correctly mark if they are opening dialogs. <br>
+        <b>Bugfixing release</b><br>
+        List only active projects.<br>
+        Changes to the UI of the setting dialog to make it more clear.<br>
+        Wording unification with GitHub integration.<br>
     ]]>
     </change-notes>
 
