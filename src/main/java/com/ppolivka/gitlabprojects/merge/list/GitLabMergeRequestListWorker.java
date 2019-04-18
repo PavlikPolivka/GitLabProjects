@@ -50,10 +50,10 @@ public class GitLabMergeRequestListWorker implements GitLabMergeRequestWorker {
 
     public void mergeBranches(final Project project, final GitlabMergeRequest mergeRequest) {
         if(mergeRequest.getTitle().startsWith("WIP:")) {
-            showErrorDialog(project, "Cannot merge this request because still WIP!", "Cannot Merge");
+            showErrorDialog(project, "Cannot merge this request because is still WIP", "Cannot Merge");
             return;
         }
-        
+
         new Task.Backgroundable(project, "Merging Branches...") {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
