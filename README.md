@@ -15,6 +15,8 @@ To build do
 
 `gradle build`
 
+See the built plugin archive in: `build/distributions`
+
 To run it in IDE and debug
 
 `gradle runIdea`
