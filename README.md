@@ -1,3 +1,7 @@
+[![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
+
+I no longer have time to maintain this. JetBrains keep changing how their vcs integration works and I no longer use Gitlab. If someone wants to continue with this email me at pavel.polivka@hey.com we can figure out some kind of hand off.
+
 ## GitLab Projects
 Simple plugin that is adding support for GitLab specific actions to JetBrain IDEs
 
