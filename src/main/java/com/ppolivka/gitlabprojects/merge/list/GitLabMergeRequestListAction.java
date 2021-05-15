@@ -14,7 +14,10 @@ import git4idea.DialogManager;
 public class GitLabMergeRequestListAction extends GitLabApiAction {
 
     public GitLabMergeRequestListAction() {
-        super("_List Merge Requests...", "List of all merge requests for this project", AllIcons.Vcs.MergeSourcesTree);
+        /*
+         * Fix missed icon Mikhail Zakharov <zmey20000@yahoo.com>, 2020.04.21
+         */
+        super("_List Merge Requests...", "List of all merge requests for this project", AllIcons.Vcs.Merge);
     }
 
     @Override

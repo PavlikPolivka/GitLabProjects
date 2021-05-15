@@ -1,8 +1,8 @@
 <idea-plugin>
     <id>com.ppolivka.gitlabprojects</id>
     <name>GitLab Projects</name>
-    <version>2.0.1</version>
-    <vendor email="polivka.pavel@gmail.com" url="https://www.ppolivka.com">Pavel Polivka</vendor>
+    <version>2.0.1.mez-3</version>
+    <vendor email="zmey20000@yahoo.com" url="https://mezzantrop.wordpress.com">Mikhail Zakharov</vendor>
 
     <description><![CDATA[
         <h2>GitLab Projects Plugin</h2>
@@ -14,13 +14,12 @@
             <li><b>GitLab Merge Request dialog</b> - user can quickly create new merge requests from current branch</li>
             <li><b>GitLab Merge Request List dialog</b> - user can list and accept all open code reviews</li>
         </ul>
+        fork from <a href="https://github.com/PavlikPolivka/GitLabProjects">https://github.com/PavlikPolivka/GitLabProjects</a></br>
+        <b>github: <a href="https://github.com/mezantrop/GitLabProjects/network">GitLabProjects</a></b>
     ]]></description>
 
     <change-notes><![CDATA[
-        <b>Bugfixing release</b><br>
-        List only active projects.<br>
-        Changes to the UI of the setting dialog to make it more clear.<br>
-        Wording unification with GitHub integration.<br>
+        <b>Trivial fix for the plugin to run on idea 2021.x</b><br>
     ]]>
     </change-notes>
 
